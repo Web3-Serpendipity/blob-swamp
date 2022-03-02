@@ -21,4 +21,11 @@ Single server that runs the game for everyone
 client js that connects to eth and the central server (websocket)
 
 
+possible inspiration:
+nodejs implentation (stale 6 years)
+https://github.com/wpengyu1505/Agar.io.clone
+
+
+list of hosted clones
+https://agario.fandom.com/wiki/Agar.io_Clones
 
