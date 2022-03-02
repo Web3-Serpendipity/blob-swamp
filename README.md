@@ -10,7 +10,7 @@ You are born as a lowly, tiny, single-celled organism... but through the power o
 
 The smart contract is relevant at the beginning and end of a round. A new blob must be 
 - minted,
-- skinned (optional 
+- skinned (optional) 
 - connected to the server
 - payouts at the end of the round/month.
 
