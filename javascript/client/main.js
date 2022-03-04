@@ -4,6 +4,8 @@ let zoom = 1;
 //array to be sent to server to show what's been eaten
 let foodEaten = [];
 
+let activePlayers = []
+
 //player blob data
 let data;
 
@@ -16,7 +18,13 @@ let data;
 // by the server when a blob feasts
 function setup() {
     createCanvas(1000, 1000);
-    blob = new Blob(random(width), random(height), 64);
+
+    let rh = random(height)
+    let rw = random(width)
+    blob = new Blob(rw, rh, 64);
+    activePlayers.push(blob)
+    npb = new Blob(rw + 30, rh + 30, 80);
+    activePlayers.push(npb)
 
     //player blob data
     data = {
@@ -30,8 +38,10 @@ function setup() {
         let x = random(-width,width)
         let y = random(-height,height)
         //this can prolly be kept to show food from server
-        food[i] = new Blob(x, y, 15);
+        food[i] = new Blob(x, y, 5);
     }
+
+
 }
 
 
@@ -46,14 +56,23 @@ function draw() {
     translate(-blob.pos.x, -blob.pos.y)
 
     blob.show();
+    npb.show();
     blob.update();
     for (let i = food.length-1; i >= 0; i--) {
         food[i].show();
         if (blob.eats(food[i])) {
             //pushes food eaten to array that can be sent to server
             foodEaten.push(i)
+            // console.log(foodEaten)
             food.splice(i, 1)
 
+        }
+    }
+    if (blob.eats(npb)) {
+        for (let i = activePlayers.length-1; i >= 0; i--) {
+            if (npb == activePlayers[i]) {
+                activePlayers.slice(i, 1)
+            }
         }
     }
 }
