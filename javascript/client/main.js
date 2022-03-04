@@ -1,13 +1,13 @@
-// const canvas = document.getElementById('canvas');
-// const ctx = canvas.getContext('2d');
-
-// ctx.fillStyle = 'green';
-// ctx.fillRect(10, 10, 10000, 10000);
-
 let blob;
 let food = [];
 let zoom = 1;
 
+
+
+// Setup plan with server/client code
+// Food will be instantiated by the server - an array 
+// will be sent over when the canvas is first drawn - foodEaten events will also be sent
+// by the server when a blob feasts
 function setup() {
     createCanvas(1000, 1000);
     blob = new Blob(0, 0, 64);
