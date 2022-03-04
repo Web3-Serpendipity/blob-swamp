@@ -5,11 +5,10 @@ let zoom = 1;
 let foodEaten = [];
 
 //player blob data
-let data = {
-    x: blob.x,
-    y: blob.y,
-    r: blob.r
-}
+let data;
+
+
+
 
 // Setup plan with server/client code
 // Food will be instantiated by the server - an array 
@@ -17,7 +16,15 @@ let data = {
 // by the server when a blob feasts
 function setup() {
     createCanvas(1000, 1000);
-    blob = new Blob(0, 0, 64);
+    blob = new Blob(random(width), random(height), 64);
+
+    //player blob data
+    data = {
+        x: blob.pos.x,
+        y: blob.pos.y,
+        r: blob.r
+    }
+
     for (let i = 0; i < 100; i++) {
         //positions will need to be fed from server
         let x = random(-width,width)
@@ -61,6 +68,10 @@ function Blob(x, y, r) {
         newVelocity.setMag(3);
         this.velocity.lerp(newVelocity, .3)
         this.pos.add(this.velocity);
+        
+        //updates radius for data
+        data.r = this.r
+        // console.log(data)
     }
 
     this.eats = function (foodItem) {
