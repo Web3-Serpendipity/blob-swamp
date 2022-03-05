@@ -3,15 +3,13 @@ let food = [];
 let zoom = 1;
 //array to be sent to server to show what's been eaten
 let foodEaten = [];
-
 let activePlayers = []
-
 //player blob data
 let data;
-
-
 let joinButton = document.querySelector("#joinButton")
 //set parameters for arena
+
+const socket = io("http://localhost:3000");
 
 // Setup plan with server/client code
 // Food will be instantiated by the server - an array 
@@ -45,17 +43,10 @@ function setup(x_pos, y_pos) {
         //this can prolly be kept to show food from server
         food[i] = new Blob(x, y, 15);
     }
-
-
 }
 
-// io.on("GameUpdate", new Emitter.Listener() {
-//     console.log("game update loop"),
-//     callback();
-// });
-
-joinButton.addEventListener('click', () => {
-    io.emit('PlayerJoinRequest');
+socket.on("GameUpdate", () => {
+    console.log("game update loop");
 });
 
 function draw() {

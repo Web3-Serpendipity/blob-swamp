@@ -2,7 +2,7 @@ const {Server} = require("socket.io");
 const {insert} = require("./util.js");
 const {Vector} = require("./vector.js");
 
-const io = new Server(3000);
+const io = new Server(3000, {secure: false});
 var players = [];
 const field_w = 1000;
 const field_h = 1000;
