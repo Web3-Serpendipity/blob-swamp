@@ -1,6 +1,6 @@
-import {Server} from "socket.io";
-import {insert} from "./util.js";
-import {Vector} from "./vector.js";
+const {Server} = require("socket.io");
+const {insert} = require("./util.js");
+const {Vector} = require("./vector.js");
 
 const io = new Server(3000);
 var players = [];
@@ -29,3 +29,5 @@ io.on("connection", (socket) => {
     playerId = null;
   });
 });
+
+console.log('The server is working. Ctrl+C to stop.');

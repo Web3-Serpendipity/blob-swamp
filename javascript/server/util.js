@@ -10,3 +10,5 @@ function insert(arr, val) {
 	arr.push(val);
 	return (arr.length - 1);
 }
+
+exports.insert = insert

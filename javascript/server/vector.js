@@ -132,3 +132,5 @@ Vector.dot = function(a, b) {
 Vector.cross = function(a, b) {
 	return a.x * b.y - a.y * b.x;
 };
+
+exports.Vector = Vector
