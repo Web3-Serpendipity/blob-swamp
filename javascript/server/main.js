@@ -21,13 +21,17 @@ io.on("connection", (socket) => {
 
     callback(playerData.id);
     io.emit("PlayerJoined", playerData.id, playerData.blob);
+    console.log(`Player ${playerId} has joined the game.`);
   });
 
   socket.on("PlayerLeaveRequest", () => {
     delete players[playerId];
     io.emit("PlayerLeft", playerId);
+    console.log(`Player ${playerId} left the game.`);
     playerId = null;
   });
+
+  console.log('Player connected.')
 });
 
 console.log('The server is working. Ctrl+C to stop.');
