@@ -73,8 +73,11 @@ Vector.prototype = {
 	cross: function(v) {
 		return this.x * v.y - this.y * v.x
 	},
+	lengthsqr: function() {
+		return this.dot(this);
+	},
 	length: function() {
-		return Math.sqrt(this.dot(this));
+		return Math.sqrt(this.lengthsqr());
 	},
 	normalize: function() {
 		return this.divide(this.length());
