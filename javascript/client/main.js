@@ -8,18 +8,19 @@ let activePlayers = []
 let data;
 let joinButton = document.querySelector("#joinButton")
 //set parameters for arena
-
+let playerID;
 const socket = io("http://localhost:3000");
 
 // Setup plan with server/client code
 // Food will be instantiated by the server - an array 
 // will be sent over when the canvas is first drawn - foodEaten events will also be sent
 // by the server when a blob feasts
-function setup(x_pos, y_pos) {
+function setup() {
     createCanvas(1000, 1000);
+    socket.emit("PlayerJoinRequest", 0 , (x) => { playerID = x; });
 
-    let w = x_pos || random(width)
-    let h = y_pos || random(height)
+    let w = random(width)
+    let h = random(height)
     blob = new Blob(w, h, 64);
     activePlayers.push(blob)
     // npb = new Blob(rw + 130, rh + 130, 80);

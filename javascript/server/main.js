@@ -81,7 +81,9 @@ function game_loop() {
   var contents = [];
   for (i = 0; i < players.length; i++) {
     let data = players[i];
-    contents[i] = [data.id, data.pos.x, data.pos.y, data.velocity.x, data.velocity.y];
+    if (data != undefined) {
+      contents[i] = [data.id, data.pos.x, data.pos.y, data.velocity.x, data.velocity.y];
+    }
   }
 
   io.emit("GameUpdate", contents);
