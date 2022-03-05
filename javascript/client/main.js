@@ -6,7 +6,7 @@ let foodEaten = [];
 let activePlayers = []
 //player blob data
 let data;
-let joinButton = document.querySelector("#joinButton")
+const joinButton = document.querySelector("#joinButton")
 //set parameters for arena
 let playerID;
 const socket = io("http://localhost:3000");
@@ -121,3 +121,7 @@ function Blob(x, y, r) {
 function randomHex() {
     return Math.floor(Math.random() * 256)
 }
+
+joinButton.addEventListener('click', () => {
+    
+})
