@@ -1,5 +1,3 @@
-const { callbackify } = require("util");
-
 let blob;
 let food = [];
 let zoom = 1;
@@ -51,10 +49,10 @@ function setup(x_pos, y_pos) {
 
 }
 
-io.on("GameUpdate", new Emitter.Listener() {
-    console.log("game update loop"),
-    callback();
-});
+// io.on("GameUpdate", new Emitter.Listener() {
+//     console.log("game update loop"),
+//     callback();
+// });
 
 joinButton.addEventListener('click', () => {
     io.emit('PlayerJoinRequest');
