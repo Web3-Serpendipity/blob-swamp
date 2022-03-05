@@ -13,8 +13,8 @@ io.on("connection", (socket) => {
 
   socket.on("PlayerJoinRequest", (tokenId, callback) => {
     var playerData = {
-      pos: Vector(Math.floor(Math.random(field_w)), Math.floor(Math.random(field_h))),
-      velocity: Vector(0, 0),
+      pos: new Vector(Math.floor(Math.random(field_w)), Math.floor(Math.random(field_h))),
+      velocity: new Vector(0, 0),
       blob: {}
     };
     playerData.id = insert(players, playerData);
@@ -32,11 +32,17 @@ io.on("connection", (socket) => {
     playerId = null;
   });
 
-  console.log('Player connected.')
+  console.log('Player connected.');
 });
 
 function game_loop() {
-  io.emit("GameUpdate", []);
+  var contents = [];
+  for (i = 0; i < players.length; i++) {
+    let data = players[i];
+    contents[i] = [data.id, data.pos.x, data.pos.y, data.velocity.x, data.velocity.y];
+  }
+
+  io.emit("GameUpdate", contents);
   //console.log('Server tick.');
 }
 
