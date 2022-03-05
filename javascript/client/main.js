@@ -17,7 +17,11 @@ let data;
 // will be sent over when the canvas is first drawn - foodEaten events will also be sent
 // by the server when a blob feasts
 function setup(x_pos, y_pos) {
-    createCanvas(1000, 1000);
+    // createCanvas(1000, 1000);
+    // let canvasSize = (activePlayers.length + 1) * 100
+    // console.log(activePlayers.length)
+    // console.log(canvasSize)
+    // createCanvas(1000, 1000);
 
     let w = x_pos || random(width)
     let h = y_pos || random(height)
@@ -45,12 +49,14 @@ function setup(x_pos, y_pos) {
         food[i] = new Blob(x, y, 15);
     }
 
-
+    
+    
 }
 
 
 
 function draw() {
+    
     background(0);
 
     translate(width/2, height/2)
@@ -66,6 +72,8 @@ function draw() {
 
     blob.show();
     blob.update();
+    blob.constrain();
+
     for (let i = food.length-1; i >= 0; i--) {
         food[i].show();
         if (blob.eats(food[i])) {
@@ -107,6 +115,11 @@ function Blob(x, y, r) {
             return true
         }
         return false;
+    }
+
+    this.constrain = function () {
+        blob.pos.x = constrain(blob.pos.x, -width, width)
+        blob.pos.y = constrain(blob.pos.y, -height, height)
     }
 
     let red = randomHex()
