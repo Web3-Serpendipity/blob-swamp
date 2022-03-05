@@ -75,7 +75,6 @@ function game_loop() {
   }
 
   io.emit("GameUpdate", contents);
-  //console.log('Server tick.');
 }
 
 setInterval(game_loop, (1000/tickrate))

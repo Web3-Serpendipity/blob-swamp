@@ -49,6 +49,11 @@ function setup(x_pos, y_pos) {
 
 }
 
+// io.on("GameUpdate", new Emitter.Listener() {
+//     console.log("game update loop"),
+//     callback();
+// });
+
 joinButton.addEventListener('click', () => {
     io.emit('PlayerJoinRequest');
 });
@@ -120,7 +125,6 @@ function Blob(x, y, r) {
         ellipse(this.pos.x, this.pos.y, this.r*2, this.r*2)
     }
 }
-
 
 function randomHex() {
     return Math.floor(Math.random() * 256)
