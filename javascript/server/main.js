@@ -6,6 +6,7 @@ const io = new Server(3000);
 var players = [];
 const field_w = 1000;
 const field_h = 1000;
+const tickrate = 10;
 
 io.on("connection", (socket) => {
   var playerId = null;
@@ -33,5 +34,12 @@ io.on("connection", (socket) => {
 
   console.log('Player connected.')
 });
+
+function game_loop() {
+  io.emit("GameUpdate", []);
+  //console.log('Server tick.');
+}
+
+setInterval(game_loop, (1000/tickrate))
 
 console.log('The server is working. Ctrl+C to stop.');
