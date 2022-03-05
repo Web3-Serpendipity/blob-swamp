@@ -26,9 +26,9 @@ function setup() {
     // npb = new Blob(rw + 130, rh + 130, 80);
     // activePlayers.push(npb)
 
-    for (let i = 0; i < 10; i++) {
-        activePlayers[i] = new Blob(random(width), random(height), 64)
-    }
+    // for (let i = 0; i < 10; i++) {
+    //     activePlayers[i] = new Blob(random(width), random(height), 64)
+    // }
 
     //player blob data
     data = {
