@@ -8,8 +8,15 @@ const field_w = 1000;
 const field_h = 1000;
 const tickrate = 10;
 
+io.on('connection', (socket) => {
+    socket.on('disconnect', () => {
+        console.log('A user has disconnected.');
+    })
+});
+
 io.on("connection", (socket) => {
   var playerId = null;
+  console.log('A user just connected.');
 
   socket.on("PlayerJoinRequest", (tokenId, callback) => {
     var playerData = {
@@ -24,6 +31,10 @@ io.on("connection", (socket) => {
     io.emit("PlayerJoined", playerData.id, playerData.blob);
     console.log(`Player ${playerId} has joined the game.`);
   });
+    
+  socket.on('disconnect', () => {
+    console.log('A user has disconnected.');
+  })
 
   socket.on("PlayerLeaveRequest", () => {
     delete players[playerId];

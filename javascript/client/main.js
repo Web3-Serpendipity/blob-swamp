@@ -10,6 +10,7 @@ let activePlayers = []
 let data;
 
 
+let joinButton = document.querySelector("#joinButton")
 //set parameters for arena
 
 // Setup plan with server/client code
@@ -48,7 +49,9 @@ function setup(x_pos, y_pos) {
 
 }
 
-
+joinButton.addEventListener('click', () => {
+    io.emit('PlayerJoinRequest');
+});
 
 function draw() {
     background(0);
