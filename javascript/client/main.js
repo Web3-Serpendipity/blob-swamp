@@ -10,21 +10,25 @@ let activePlayers = []
 let data;
 
 
-
+//set parameters for arena
 
 // Setup plan with server/client code
 // Food will be instantiated by the server - an array 
 // will be sent over when the canvas is first drawn - foodEaten events will also be sent
 // by the server when a blob feasts
-function setup() {
+function setup(x_pos, y_pos) {
     createCanvas(1000, 1000);
 
-    let rh = random(height)
-    let rw = random(width)
-    blob = new Blob(rw, rh, 64);
+    let w = x_pos || random(width)
+    let h = y_pos || random(height)
+    blob = new Blob(w, h, 64);
     activePlayers.push(blob)
-    npb = new Blob(rw + 30, rh + 30, 80);
-    activePlayers.push(npb)
+    // npb = new Blob(rw + 130, rh + 130, 80);
+    // activePlayers.push(npb)
+
+    for (let i = 0; i < 10; i++) {
+        activePlayers[i] = new Blob(random(width), random(height), 64)
+    }
 
     //player blob data
     data = {
@@ -38,7 +42,7 @@ function setup() {
         let x = random(-width,width)
         let y = random(-height,height)
         //this can prolly be kept to show food from server
-        food[i] = new Blob(x, y, 5);
+        food[i] = new Blob(x, y, 15);
     }
 
 
@@ -54,9 +58,13 @@ function draw() {
     zoom = lerp(zoom, newZoom, .1)
     scale(zoom)
     translate(-blob.pos.x, -blob.pos.y)
+    
+    for (let i = activePlayers.length-1; i >= 0; i--) {
+        activePlayers[i].show()
+    }
+    // console.log(activePlayers)
 
     blob.show();
-    npb.show();
     blob.update();
     for (let i = food.length-1; i >= 0; i--) {
         food[i].show();
@@ -68,11 +76,9 @@ function draw() {
 
         }
     }
-    if (blob.eats(npb)) {
-        for (let i = activePlayers.length-1; i >= 0; i--) {
-            if (npb == activePlayers[i]) {
-                activePlayers.slice(i, 1)
-            }
+    for (let i = activePlayers.length-1; i >= 0; i--) {
+        if (blob.eats(activePlayers[i])) {
+            activePlayers.splice(i, 1)
         }
     }
 }
