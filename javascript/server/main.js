@@ -8,20 +8,20 @@ const field_w = 1000;
 const field_h = 1000;
 const tickrate = 10;
 
-io.on('connection', (socket) => {
-    socket.on('disconnect', () => {
-        console.log('A user has disconnected.');
-    })
-});
-
 io.on("connection", (socket) => {
   var playerId = null;
+
+  function player() {
+    return players[playerId];
+  }
+
   console.log('A user just connected.');
 
   socket.on("PlayerJoinRequest", (tokenId, callback) => {
     var playerData = {
       pos: new Vector(Math.floor(Math.random(field_w)), Math.floor(Math.random(field_h))),
       velocity: new Vector(0, 0),
+      //socket: socket;
       blob: {}
     };
     playerData.id = insert(players, playerData);
@@ -33,7 +33,10 @@ io.on("connection", (socket) => {
   });
     
   socket.on('disconnect', () => {
-    console.log('A user has disconnected.');
+    delete players[playerId];
+    io.emit("PlayerLeft", playerId);
+    console.log(`Player ${playerId} left the game (disconnect).`);
+    playerId = null;
   })
 
   socket.on("PlayerLeaveRequest", () => {
@@ -41,6 +44,24 @@ io.on("connection", (socket) => {
     io.emit("PlayerLeft", playerId);
     console.log(`Player ${playerId} left the game.`);
     playerId = null;
+  });
+
+  socket.on('PlayerUpdate', (px, py, vx, vy) => {
+    let newpos = new Vector(px, py);
+    let newvel = new Vector(vx, vy);
+
+    if (newvel.lengthsqr() > 9) {
+      return; // discard the update
+    };
+
+    if (newpos.distancesqr(player().pos) > 9) {
+      return; // discard the update
+    };
+
+    player().pos = newpos;
+    player().velocity = newvel;
+
+    console.log(`Received PlayerUpdate event from ${playerId}`);
   });
 
   console.log('Player connected.');

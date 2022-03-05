@@ -79,6 +79,9 @@ Vector.prototype = {
 	length: function() {
 		return Math.sqrt(this.lengthsqr());
 	},
+	distancesqr: function(v) {
+		return this.subtract(v).lengthsqr();
+	},
 	normalize: function() {
 		return this.divide(this.length());
 	},
