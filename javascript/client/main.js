@@ -70,6 +70,7 @@ function draw() {
 
     blob.show();
     blob.update();
+    blob.constrain();
     vx = mouseX;
     vy = mouseY;
     console.log('PlayerID:', playerID)
@@ -119,6 +120,11 @@ function Blob(x, y, r) {
             return true
         }
         return false;
+    }
+
+    this.constrain = function () {
+        blob.pos.x = constrain(blob.pos.x, -width, width)
+        blob.pos.y = constrain(blob.pos.y, -height, height)
     }
 
     let red = randomHex()
