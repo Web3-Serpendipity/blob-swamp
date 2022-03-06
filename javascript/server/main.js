@@ -29,6 +29,8 @@ io.on("connection", (socket) => {
 
   socket.on("PlayerJoinRequest", (tokenId, callback) => {
     var playerData = {
+      x_pos: Math.random(field_w),
+      y_pos: Math.random(field_h),
       pos: new Vector(Math.floor(Math.random(field_w)), Math.floor(Math.random(field_h))),
       velocity: new Vector(0, 0),
       //socket: socket;
@@ -57,21 +59,15 @@ io.on("connection", (socket) => {
   })
 
   socket.on('PlayerUpdate', (px) => {
+    //debugging
     console.log('Update:'+ px)
-    let newpos = new Vector(px[0], px[1])
-    let newvel = new Vector(px[2], px[3])
+    console.log(players)
 
-    if (newvel.lengthsqr() > 9) {
-      return; // discard the update
-    };
-
-    if (player() != null) {
-      if (newpos.distancesqr(player().pos) > 9) {
-        return; // discard the update
-      }
-
-      player().pos = newpos;
-      player().velocity = newvel;
+    // update player id and position
+    if (players[playerId] != null){
+      players[playerId].x_pos = px[1]
+      players[playerId].y_pos = px[2]
+      let newvel = new Vector(px[2], px[3])
     }
     console.log(`Received PlayerUpdate event from ${playerId}`);
   })

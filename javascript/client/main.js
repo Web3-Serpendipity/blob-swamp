@@ -72,7 +72,8 @@ function draw() {
     blob.update();
     vx = mouseX;
     vy = mouseY;
-    socket.emit("PlayerUpdate", [blob.pos.x, blob.pos.y, vx, vy]);
+    console.log('PlayerID:', playerID)
+    socket.emit("PlayerUpdate", [playerID, blob.pos.x, blob.pos.y, vx, vy]);
     //iterate through the food array to get the food
     for (let i = food.length-1; i >= 0; i--) {
         food[i].show();
