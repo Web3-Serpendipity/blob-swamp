@@ -14,9 +14,11 @@ let vx,vy;
 const socket = io("http://localhost:3000");
 
 socket.on("GameUpdate", (x) => {
+    enemies = []
     x.forEach(element => {
-        ind = element[0]
-        enemies[ind] = (element[1], element[2], 25)
+        if (element != null){
+            enemies.push({x_pos: element['x_pos'], y_pos: element['y_pos'],radius: 25})
+        }
     });
 });
 // Setup plan with server/client code
@@ -61,6 +63,11 @@ function draw() {
     for (let i = activePlayers.length-1; i >= 0; i--) {
         activePlayers[i].show()
     }
+    enemies.forEach(player => {
+        enemy = new Blob(player.x_pos, player.y_pos, 25);
+        enemy.show()
+    })
+
     blob.show();
     blob.update();
     blob.constrain();

@@ -76,17 +76,8 @@ io.on("connection", (socket) => {
 })
 
 function game_loop() {
-  var contents = [];
-  for (i = 0; i < players.length; i++) {
-    let data = players[i];
-    if (data != undefined) {
-      contents[i] = [data.id, data.pos.x, data.pos.y, data.velocity.x, data.velocity.y];
-    }
-  }
-
-  io.emit("GameUpdate", contents);
+  io.emit("GameUpdate", players);
 }
-
 setInterval(game_loop, (1000/tickrate))
 
 console.log('The server is working. Ctrl+C to stop.');
