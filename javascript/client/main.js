@@ -6,7 +6,7 @@ let foodEaten = [];
 let activePlayers = []
 //player blob data
 let data;
-let joinButton = document.querySelector("#joinButton")
+const joinButton = document.querySelector("#joinButton")
 //set parameters for arena
 let playerID;
 let vx,vy;
@@ -20,8 +20,7 @@ socket.on("GameUpdate", () => {
 // will be sent over when the canvas is first drawn - foodEaten events will also be sent
 // by the server when a blob feasts
 function setup() {
-    // Create canvas
-    createCanvas(1000, 1000);
+    createCanvas(windowWidth, windowHeight)
     socket.emit("PlayerJoinRequest", 0 , (x) => { playerID = x; });
 
     let w = random(width)
@@ -31,9 +30,9 @@ function setup() {
     // npb = new Blob(rw + 130, rh + 130, 80);
     // activePlayers.push(npb)
 
-    for (let i = 0; i < 10; i++) {
-        activePlayers[i] = new Blob(random(width), random(height), 64)
-    }
+    // for (let i = 0; i < 10; i++) {
+    //     activePlayers[i] = new Blob(random(width), random(height), 64)
+    // }
 
     //player blob data
     data = {
@@ -139,3 +138,14 @@ function Blob(x, y, r) {
 function randomHex() {
     return Math.floor(Math.random() * 256)
 }
+
+joinButton.addEventListener('click', () => {
+    
+})
+
+document.getElementById('close-modal-btn').addEventListener('click', () => {
+    let modal = document.querySelector('#join-game-modal')
+    modal.style.display = 'none'
+    let header = document.querySelector('.header')
+    header.style.display = 'none'
+})

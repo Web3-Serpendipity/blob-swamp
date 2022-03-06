@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js" crossorigin="anonymous"></script>
-        <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Monoton&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="styles.css">
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js" crossorigin="anonymous"></script> -->
         <script async src="p5.js"></script>
         <script async src="main.js"></script>
         <script type="module">
@@ -14,7 +17,19 @@
         <title>Blob Swamp</title>
     </head>
     <body>
-        <button id="joinButton" name="joinButton"></button>
+        <h1 class="header">Blob Wars!</h1>
+        <div id="join-game-modal" class=" active">
+            <div class="modal-title">
+                    <h2>Hello!</h2>
+                    <button id="close-modal-btn">X</button>
+            </div>
+            <div class="info-fields">
+                <h2>Welcome to Blob Wars</h2>
+                <p>Please connect your wallet to begin.</p>
+                <button>Connect Wallet</button>
+                <button id="joinButton" name="joinButton" class="active">Join Game</button>
+            </div>
+        </div>
         <!--    <script src="/socket.io/socket.io.js"></script> -->
     </body>
 </html>
