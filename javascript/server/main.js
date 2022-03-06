@@ -95,7 +95,7 @@ io.on("connection", (socket) => {
 // Spawn the food
 
 function spawnFood(n) {
-  for (let i = 0; i <= n; i++) {
+  for (let i = 0; i < n; i++) {
     //positions will need to be fed from server
     let x = -field_w + Math.random()*field_w*2;
     let y = -field_h + Math.random()*field_h*2;
