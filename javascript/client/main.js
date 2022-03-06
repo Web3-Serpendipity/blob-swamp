@@ -17,7 +17,7 @@ socket.on("GameUpdate", (x) => {
     enemies = []
     x.forEach(element => {
         if (element != null){
-            enemies.push({x_pos: element['x_pos'], y_pos: element['y_pos'],radius: 25})
+            enemies.push({x_pos: element['x_pos'], y_pos: element['y_pos'],radius: 45})
         }
     });
 });
@@ -64,8 +64,8 @@ function draw() {
         activePlayers[i].show()
     }
     enemies.forEach(player => {
-        enemy = new Blob(player.x_pos, player.y_pos, 25);
-        enemy.show()
+        fill(red, green, blue)
+        ellipse(player.x_pos, player.y_pos, 45, 45)
     })
 
     blob.show();
