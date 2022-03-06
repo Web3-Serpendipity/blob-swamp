@@ -69,9 +69,10 @@ io.on("connection", (socket) => {
     if (players[playerId] != null){
       players[playerId].x_pos = px[1]
       players[playerId].y_pos = px[2]
-      let newvel = new Vector(px[2], px[3])
+      players[playerId].mouseX = px[3]
+      players[playerId].mouseY = px[4]
+      players[playerId].radius = px[5]
     }
-    console.log(`Received PlayerUpdate event from ${playerId}`);
   })
 
   console.log('Player has successfully connected.');
