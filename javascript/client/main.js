@@ -65,13 +65,13 @@ function draw() {
     }
     enemies.forEach(player => {
         fill(red, green, blue)
-        ellipse(player.x_pos, player.y_pos, 45, 45)
+        ellipse(player.x_pos, player.y_pos, player.radius, player.radius)
     })
 
     blob.show();
     blob.update();
     blob.constrain();
-    socket.emit("PlayerUpdate", [playerID, blob.pos.x, blob.pos.y, mouseX, mouseY]);
+    socket.emit("PlayerUpdate", [playerID, blob.pos.x, blob.pos.y, mouseX, mouseY,blob.r]);
     //iterate through the food array to get the food
     for (let i = food.length-1; i >= 0; i--) {
         food[i].show();
