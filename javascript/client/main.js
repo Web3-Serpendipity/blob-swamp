@@ -4,6 +4,7 @@ let zoom = 1;
 //array to be sent to server to show what's been eaten
 let foodEaten = [];
 let activePlayers = []
+let enemies = []
 //player blob data
 let data;
 const joinButton = document.querySelector("#joinButton")
@@ -12,8 +13,11 @@ let playerID;
 let vx,vy;
 const socket = io("http://localhost:3000");
 
-socket.on("GameUpdate", () => {
-    console.log("game update loop");
+socket.on("GameUpdate", (x) => {
+    x.forEach(element => {
+        ind = element[0]
+        enemies[ind] = (element[1], element[2], 25)
+    });
 });
 // Setup plan with server/client code
 // Food will be instantiated by the server - an array 
@@ -27,12 +31,6 @@ function setup() {
     let h = random(height)
     blob = new Blob(w, h, 64);
     activePlayers.push(blob)
-    // npb = new Blob(rw + 130, rh + 130, 80);
-    // activePlayers.push(npb)
-
-    // for (let i = 0; i < 10; i++) {
-    //     activePlayers[i] = new Blob(random(width), random(height), 64)
-    // }
 
     //player blob data
     data = {
@@ -50,8 +48,6 @@ function setup() {
     }
 }
 
-
-
 // Main Game Loop
 function draw() {
     background(0);
@@ -65,15 +61,10 @@ function draw() {
     for (let i = activePlayers.length-1; i >= 0; i--) {
         activePlayers[i].show()
     }
-    // console.log(activePlayers)
-
     blob.show();
     blob.update();
     blob.constrain();
-    vx = mouseX;
-    vy = mouseY;
-    console.log('PlayerID:', playerID)
-    socket.emit("PlayerUpdate", [playerID, blob.pos.x, blob.pos.y, vx, vy]);
+    socket.emit("PlayerUpdate", [playerID, blob.pos.x, blob.pos.y, mouseX, mouseY]);
     //iterate through the food array to get the food
     for (let i = food.length-1; i >= 0; i--) {
         food[i].show();
@@ -85,8 +76,6 @@ function draw() {
 
         }
     }
-
-    
     // Check to see if blobs are eating each other
     for (let i = activePlayers.length-1; i >= 0; i--) {
         if (blob.eats(activePlayers[i])) {
