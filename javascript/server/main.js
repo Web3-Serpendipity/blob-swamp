@@ -83,12 +83,12 @@ function game_loop() {
   for (i = 0; i < players.length; i++) {
     let data = players[i];
     if (data != undefined) {
-      contents[i] = [data.id, data.pos.x, data.pos.y, data.velocity.x, data.velocity.y, data.size];
-    };
-  };
+      contents.push([data.id, data.pos.x, data.pos.y, data.velocity.x, data.velocity.y, data.size]);
+    }
+  }
 
-  io.emit("GameUpdate", players);
+  io.emit("GameUpdate", contents);
 }
-setInterval(game_loop, (1000/tickrate))
+setInterval(game_loop, (1000/tickrate));
 
 console.log('The server is working. Ctrl+C to stop.');
