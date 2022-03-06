@@ -16,7 +16,7 @@ const socket = io("http://localhost:3000");
 // will be sent over when the canvas is first drawn - foodEaten events will also be sent
 // by the server when a blob feasts
 function setup() {
-    createCanvas(1000, 1000);
+    createCanvas(windowWidth, windowHeight)
     socket.emit("PlayerJoinRequest", 0 , (x) => { playerID = x; });
 
     let w = random(width)
@@ -66,6 +66,7 @@ function draw() {
 
     blob.show();
     blob.update();
+    blob.constrain();
     for (let i = food.length-1; i >= 0; i--) {
         food[i].show();
         if (blob.eats(food[i])) {
@@ -109,6 +110,11 @@ function Blob(x, y, r) {
         return false;
     }
 
+    this.constrain = function () {
+        blob.pos.x = constrain(blob.pos.x, -width, width)
+        blob.pos.y = constrain(blob.pos.y, -height, height)
+    }
+
     let red = randomHex()
     let green = randomHex()
     let blue = randomHex()
@@ -124,4 +130,11 @@ function randomHex() {
 
 joinButton.addEventListener('click', () => {
     
+})
+
+document.getElementById('close-modal-btn').addEventListener('click', () => {
+    let modal = document.querySelector('#join-game-modal')
+    modal.style.display = 'none'
+    let header = document.querySelector('.header')
+    header.style.display = 'none'
 })
