@@ -9,13 +9,18 @@ let data;
 let joinButton = document.querySelector("#joinButton")
 //set parameters for arena
 let playerID;
+let vx,vy;
 const socket = io("http://localhost:3000");
 
+socket.on("GameUpdate", () => {
+    console.log("game update loop");
+});
 // Setup plan with server/client code
 // Food will be instantiated by the server - an array 
 // will be sent over when the canvas is first drawn - foodEaten events will also be sent
 // by the server when a blob feasts
 function setup() {
+    // Create canvas
     createCanvas(1000, 1000);
     socket.emit("PlayerJoinRequest", 0 , (x) => { playerID = x; });
 
@@ -46,10 +51,9 @@ function setup() {
     }
 }
 
-socket.on("GameUpdate", () => {
-    console.log("game update loop");
-});
 
+
+// Main Game Loop
 function draw() {
     background(0);
 
@@ -66,6 +70,10 @@ function draw() {
 
     blob.show();
     blob.update();
+    vx = mouseX;
+    vy = mouseY;
+    socket.emit("PlayerUpdate", [blob.pos.x, blob.pos.y, vx, vy]);
+    //iterate through the food array to get the food
     for (let i = food.length-1; i >= 0; i--) {
         food[i].show();
         if (blob.eats(food[i])) {
@@ -76,6 +84,9 @@ function draw() {
 
         }
     }
+
+    
+    // Check to see if blobs are eating each other
     for (let i = activePlayers.length-1; i >= 0; i--) {
         if (blob.eats(activePlayers[i])) {
             activePlayers.splice(i, 1)

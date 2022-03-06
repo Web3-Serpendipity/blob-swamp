@@ -54,28 +54,30 @@ io.on("connection", (socket) => {
     io.emit("PlayerLeft", playerId);
     console.log(`Player ${playerId} left the game.`);
     playerId = null;
-  });
+  })
 
-  socket.on('PlayerUpdate', (px, py, vx, vy) => {
-    let newpos = new Vector(px, py);
-    let newvel = new Vector(vx, vy);
+  socket.on('PlayerUpdate', (px) => {
+    console.log('Update:'+ px)
+    let newpos = new Vector(px[0], px[1])
+    let newvel = new Vector(px[2], px[3])
 
     if (newvel.lengthsqr() > 9) {
       return; // discard the update
     };
 
-    if (newpos.distancesqr(player().pos) > 9) {
-      return; // discard the update
-    };
+    if (player() != null) {
+      if (newpos.distancesqr(player().pos) > 9) {
+        return; // discard the update
+      }
 
-    player().pos = newpos;
-    player().velocity = newvel;
-
+      player().pos = newpos;
+      player().velocity = newvel;
+    }
     console.log(`Received PlayerUpdate event from ${playerId}`);
-  });
+  })
 
-  console.log('Player connected.');
-});
+  console.log('Player has successfully connected.');
+})
 
 function game_loop() {
   var contents = [];
