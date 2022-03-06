@@ -29,6 +29,8 @@ io.on("connection", (socket) => {
 
   socket.on("PlayerJoinRequest", (tokenId, callback) => {
     var playerData = {
+      x_pos: Math.random(field_w),
+      y_pos: Math.random(field_h),
       pos: new Vector(Math.floor(Math.random(field_w)), Math.floor(Math.random(field_h))),
       velocity: new Vector(0, 0),
       //socket: socket;
@@ -54,28 +56,24 @@ io.on("connection", (socket) => {
     io.emit("PlayerLeft", playerId);
     console.log(`Player ${playerId} left the game.`);
     playerId = null;
-  });
+  })
 
-  socket.on('PlayerUpdate', (px, py, vx, vy) => {
-    let newpos = new Vector(px, py);
-    let newvel = new Vector(vx, vy);
+  socket.on('PlayerUpdate', (px) => {
+    //debugging
+    console.log('Update:'+ px)
+    console.log(players)
 
-    if (newvel.lengthsqr() > 9) {
-      return; // discard the update
-    };
-
-    if (newpos.distancesqr(player().pos) > 9) {
-      return; // discard the update
-    };
-
-    player().pos = newpos;
-    player().velocity = newvel;
-
+    // update player id and position
+    if (players[playerId] != null){
+      players[playerId].x_pos = px[1]
+      players[playerId].y_pos = px[2]
+      let newvel = new Vector(px[2], px[3])
+    }
     console.log(`Received PlayerUpdate event from ${playerId}`);
-  });
+  })
 
-  console.log('Player connected.');
-});
+  console.log('Player has successfully connected.');
+})
 
 function game_loop() {
   var contents = [];
