@@ -17,6 +17,7 @@ var players = [];
 const field_w = 1000;
 const field_h = 1000;
 const tickrate = 10;
+const food_size = 15;
 
 io.on("connection", (socket) => {
   var playerId = null;
@@ -33,6 +34,7 @@ io.on("connection", (socket) => {
       y_pos: Math.random(field_h),
       pos: new Vector(Math.floor(Math.random(field_w)), Math.floor(Math.random(field_h))),
       velocity: new Vector(0, 0),
+      size: 64, // TODO
       //socket: socket;
       blob: {}
     };
@@ -76,6 +78,15 @@ io.on("connection", (socket) => {
 })
 
 function game_loop() {
+  // broadcast the game update to all clients
+  var contents = [];
+  for (i = 0; i < players.length; i++) {
+    let data = players[i];
+    if (data != undefined) {
+      contents[i] = [data.id, data.pos.x, data.pos.y, data.velocity.x, data.velocity.y, data.size];
+    };
+  };
+
   io.emit("GameUpdate", players);
 }
 setInterval(game_loop, (1000/tickrate))
