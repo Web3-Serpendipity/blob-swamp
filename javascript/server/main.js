@@ -1,5 +1,9 @@
-const {insert} = require("./util.js");
+const {insert, pick_random} = require("./util.js");
 const {Vector} = require("./vector.js");
+const { ethers } = require("ethers");
+
+const {RPC_URL, WALLET_SEED, CONTRACT_ADDRESS, WALLET_ADDRESS} = require('./../../../constants.js');
+const {DESC_DB, COLOR_DB} = require('./blob_params_db.js');
 
 const {createServer} = require("http");
 const {Server} = require("socket.io");
@@ -15,16 +19,38 @@ io.listen(3000);
 
 let players = [];
 let food = [];
+let nfts;
+let staked;
+let contractWrite;
 const field_w = 1000;
 const field_h = 1000;
 const tickrate = 10;
 const food_size = 15;
 
+async function getBlobMetadata(tokenId) {
+  return await nfts.findOne({_id: tokenId});
+}
+
 io.on("connection", (socket) => {
   let playerId = null;
+  let playerWallet; // TODO: get playerWallet from login
 
   function player() {
     return players[playerId];
+  }
+
+  async function stakedBlobs() {
+    let cursor = await staked.find({_id: playerWallet});
+    let blobs = [];
+    await cursor.forEach((x) => {
+      blobs.push(x.token);
+    });
+
+    return blobs;
+  }
+
+  async function isBlobStaked(id) {
+    return (await stakedBlobs()).includes(id);
   }
 
   console.log('A user just connected.');
@@ -89,6 +115,23 @@ io.on("connection", (socket) => {
     player().velocity = newvel;
   })
 
+  socket.on('Unstake', (tokenId) => {
+    if (!await isBlobStaked(tokenId)) {return;}
+
+    let data = await getBlobMetadata(tokenId);
+    data.size = player().size;
+
+    // kick the player from the game
+    if (playerId != null) {
+      delete players[playerId];
+      io.emit("PlayerLeft", playerId);
+      console.log(`Player ${playerId} left the game.`);
+      playerId = null;
+    }
+
+    await contractWrite.safeTransferFrom(WALLET_ADDRESS, playerWallet, tokenId);
+  })
+
   console.log('Player has successfully connected.');
 })
 
@@ -135,7 +178,7 @@ function game_loop() {
   }
 
   // Respawn eaten food
-  spawnFood(removed_food);
+  spawnFood(removed_food)death;
 
   // TODO: Check eating of other blobs
   /*dead_players = [];
@@ -172,5 +215,81 @@ function game_loop() {
   io.emit("GameUpdate", contents);
 }
 setInterval(game_loop, (1000/tickrate));
+
+//
+// Connect to MongoDB
+//
+
+const MongoClient = require("mongodb").MongoClient;
+    
+const url = "mongodb://localhost:27017/";
+const mongoClient = new MongoClient(url);
+await mongoClient.connect();
+const db = mongoClient.db("blobwars");
+nfts = db.collection("nfts");
+staked = db.collection("staked");
+
+var express = require('express');
+var app = express();
+
+// nft api
+
+app.get('/blobInfo/:id', function (req, res) {
+  let qr = await getBlobMetadata(req.params.id);
+  console.log('blobInfo call', qr);
+  res.end(JSON.stringify(qr));
+})
+
+var server = app.listen(80, function () {
+   var host = server.address().address
+   var port = server.address().port
+   console.log("blobInfo listening @ http://%s:%s", host, port)
+})
+
+//
+// Connect the wallet
+//
+
+// If you don't specify a //url//, Ethers connects to the default 
+// (i.e. ``http:/\/localhost:8545``)
+const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
+const signer = ethers.Wallet.fromMnemonic(WALLET_SEED).connect(provider);
+
+const contract = new ethers.Contract(CONTRACT_ADDRESS, [
+  "function safeTransferFrom(address from, address to, uint256 tokenId) public",
+  "event Transfer(address from, address to, uint256 tokenId)",
+  "event BlobBought(address player, uint256 tokenId)",
+  "function buyBlob() external payable"
+], provider);
+
+contractWrite = contract.connect(signer);
+
+contract.on('BlobBought', (player, tokenId) => {
+  await nfts.insertOne({
+    _id: tokenId,
+    name: "Unnamed",
+    description: pick_random(DESC_DB),
+    color: pick_random(COLOR_DB),
+    size: 7 + Math.floor(Math.random()*9),
+    dead: false,
+    image: "https://static.wikia.nocookie.net/meme/images/7/7e/Ytroll-troll-crazy-insane.png" // TODO
+  });
+})
+
+contract.on('Transfer', (from, to, tokenId) => {
+  if (to == WALLET_ADDRESS) {
+    await staked.insertOne({
+      _id: from,
+      token: tokenId
+    });
+  } else if (from == WALLET_ADDRESS) {
+    await staked.deleteOne({
+      _id: to,
+      token: tokenId
+    })
+  } else {
+    return;
+  }
+})
 
 console.log('The server is working. Ctrl+C to stop.');
