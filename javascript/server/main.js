@@ -214,8 +214,6 @@ function game_loop() {
         if (!dead_players.includes(vict)) {
           dead_players.push(vict);
         }
-        i--;
-        removed_food += 1;
       }
     }
   }
