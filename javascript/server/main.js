@@ -259,7 +259,9 @@ const contract = new ethers.Contract(CONTRACT_ADDRESS, [
   "function safeTransferFrom(address from, address to, uint256 tokenId) public",
   "event Transfer(address from, address to, uint256 tokenId)",
   "event BlobBought(address player, uint256 tokenId)",
-  "function buyBlob() external payable"
+  "function tokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256)",
+  "function balanceOf(address owner) external view returns (uint256 balance)",
+  "function buyBlob() external payable" // balanceOf, tokenOfOwnerByIndex
 ], provider);
 
 contractWrite = contract.connect(signer);
