@@ -53,17 +53,36 @@ io.on("connection", (socket) => {
     return (await stakedBlobs()).includes(id);
   }
 
+  async function hasStakedBlobs() {
+    return (await stakedBlobs()).length > 0
+  }
+
   console.log('A user just connected.');
 
-  socket.on("PlayerJoinRequest", (tokenId, callback) => {
+  async function Kick() {
+    if (await hasStakedBlobs()) {
+      Unstake();
+    } else {
+      delete players[playerId];
+      io.emit("PlayerLeft", playerId);
+      console.log(`Player ${playerId} left the game (disconnect).`);
+      playerId = null;
+    }
+  }
+
+  socket.on("PlayerJoinRequest", async (tokenId, callback) => {
+    let r = await isBlobStaked(tokenId);
+    if (!r) {return;}
+
     let playerData = {
       pos: new Vector(Math.floor(Math.random()*field_w), Math.floor(Math.random()*field_h)),
       velocity: new Vector(0, 0),
       size: 64, // TODO
       //socket: socket;
-      blob: {}
+      blob: await getBlobMetadata(tokenId)
     };
     playerData.id = insert(players, playerData);
+    playerData.Kick = Kick;
     playerId = playerData.id;
 
     console.log('PlayerJoinRequest', playerId, playerData);
@@ -81,19 +100,33 @@ io.on("connection", (socket) => {
     }
     console.log(`Player ${playerId} has joined the game.`);
   });
+
+  async function Unstake() {
+    let tokenId = player().blob._id;
+    if (!await isBlobStaked(tokenId)) {return;}
+
+    let data = player().blob;
+    await nfts.replaceOne({_id: data.id}, data);
+
+    // kick the player from the game
+    if (playerId != null) {
+      delete players[playerId];
+      io.emit("PlayerLeft", playerId);
+      console.log(`Player ${playerId} left the game.`);
+      playerId = null;
+    }
+
+    await contractWrite.safeTransferFrom(WALLET_ADDRESS, playerWallet, tokenId);
+  }
     
-  socket.on('disconnect', () => {
-    delete players[playerId];
-    io.emit("PlayerLeft", playerId);
-    console.log(`Player ${playerId} left the game (disconnect).`);
-    playerId = null;
-  })
+  socket.on('disconnect', Kick)
 
   socket.on("PlayerLeaveRequest", () => {
-    delete players[playerId];
+    Unstake()
+    /*delete players[playerId];
     io.emit("PlayerLeft", playerId);
     console.log(`Player ${playerId} left the game.`);
-    playerId = null;
+    playerId = null;*/
   })
 
   socket.on('PlayerUpdate', (px, py, vx, vy) => {
@@ -113,23 +146,6 @@ io.on("connection", (socket) => {
 
     player().pos = newpos;
     player().velocity = newvel;
-  })
-
-  socket.on('Unstake', (tokenId) => {
-    if (!await isBlobStaked(tokenId)) {return;}
-
-    let data = await getBlobMetadata(tokenId);
-    data.size = player().size;
-
-    // kick the player from the game
-    if (playerId != null) {
-      delete players[playerId];
-      io.emit("PlayerLeft", playerId);
-      console.log(`Player ${playerId} left the game.`);
-      playerId = null;
-    }
-
-    await contractWrite.safeTransferFrom(WALLET_ADDRESS, playerWallet, tokenId);
   })
 
   console.log('Player has successfully connected.');
@@ -152,7 +168,7 @@ spawnFood(100);
 // Start the main game loop
 
 function getPredator(p1, p2) {
-  return (p1.size > p2.size && p1) || (p2.size > p1.size && p2) || null;
+  return (p1.size > p2.size && [p1, p2]) || (p2.size > p1.size && [p2, p1]) || [null, null];
 }
 
 function game_loop() {
@@ -178,10 +194,10 @@ function game_loop() {
   }
 
   // Respawn eaten food
-  spawnFood(removed_food)death;
+  spawnFood(removed_food);
 
   // TODO: Check eating of other blobs
-  /*dead_players = [];
+  dead_players = [];
   for (i = 0; i < players.length; i++) {
     let ply1 = players[i];
     if (ply1 == undefined) {continue};
@@ -189,19 +205,22 @@ function game_loop() {
     for (j = 0; j < players.length; j++) {
       let ply2 = players[j]
       if (ply1.pos.distancesqr(ply2.pos) < (ply1.size + ply2.size)**2) {
-        let predator = getPredator(ply1, ply2);
-        if (predator == null) {continue};
+        let [att, vict] = getPredator(ply1, ply2);
+        if (att == null) {continue};
 
-        let sum = Math.PI * ply.size * ply.size + Math.PI * 15 * 15;
-        ply.size = sqrt(sum / Math.PI);
+        let sum = Math.PI * att.size * att.size + Math.PI * vict.size * vict.size;
+        att.size = sqrt(sum / Math.PI);
 
-        dead_players.push()
-        io.emit('FoodEaten', i);
+        if (!dead_players.includes(vict)) {
+          dead_players.push(vict);
+        }
         i--;
         removed_food += 1;
       }
     }
-  }*/
+  }
+
+  dead_players.forEach((p) => {p.Kick()});
 
   // broadcast the game update to all clients
   let contents = [];
@@ -224,23 +243,27 @@ const MongoClient = require("mongodb").MongoClient;
     
 const url = "mongodb://localhost:27017/";
 const mongoClient = new MongoClient(url);
-await mongoClient.connect();
-const db = mongoClient.db("blobwars");
-nfts = db.collection("nfts");
-staked = db.collection("staked");
+let db;
+async function mongoSetup() {
+  await mongoClient.connect();
+  db = mongoClient.db("blobwars");
+  nfts = db.collection("nfts");
+  staked = db.collection("staked");
+}
+mongoSetup();
 
 var express = require('express');
 var app = express();
 
 // nft api
 
-app.get('/blobInfo/:id', function (req, res) {
+app.get('/blobInfo/:id', async (req, res) => {
   let qr = await getBlobMetadata(req.params.id);
   console.log('blobInfo call', qr);
   res.end(JSON.stringify(qr));
 })
 
-var server = app.listen(80, function () {
+var server = app.listen(8081, function () {
    var host = server.address().address
    var port = server.address().port
    console.log("blobInfo listening @ http://%s:%s", host, port)
@@ -266,7 +289,7 @@ const contract = new ethers.Contract(CONTRACT_ADDRESS, [
 
 contractWrite = contract.connect(signer);
 
-contract.on('BlobBought', (player, tokenId) => {
+contract.on('BlobBought', async (player, tokenId) => {
   await nfts.insertOne({
     _id: tokenId,
     name: "Unnamed",
@@ -278,7 +301,7 @@ contract.on('BlobBought', (player, tokenId) => {
   });
 })
 
-contract.on('Transfer', (from, to, tokenId) => {
+contract.on('Transfer', async (from, to, tokenId) => {
   if (to == WALLET_ADDRESS) {
     await staked.insertOne({
       _id: from,
