@@ -2,11 +2,6 @@
     margin: 0;
     padding: 0;
 }
-#arena {
-    height: 100vh;
-    width: 100%;
-    background: blue;
-}
 
 .header {
     margin: .5em auto;
@@ -28,9 +23,4 @@
 .modal-title {
     display: flex;
     justify-content: space-between;
-}
-
-.p5canvas {
-    height: 100vh;
-    width: 100%;
 }
