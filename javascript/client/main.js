@@ -1,7 +1,15 @@
-import { ethers } from "ethers";
+// import { ethers } from "https://cdn.ethers.io/lib/ethers-5.2.esm.min.js";
+
+var isMetamaskInstalled = () => ethereum.isMetamaskInstalled
+
+if (isMetamaskInstalled) {
+    console.log('Metamask is installed!')
+} else {
+    alert('Install Metamask extention to connect with DApp!')
+}
 // A Web3Provider wraps a standard Web3 provider, which is
 // what MetaMask injects as window.ethereum into each page
-const provider = new ethers.providers.Web3Provider(window.ethereum)
+const provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
 
 // MetaMask requires requesting permission to connect users accounts
 
