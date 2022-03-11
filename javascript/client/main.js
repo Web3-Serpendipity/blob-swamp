@@ -115,7 +115,6 @@ function draw() {
         blob.update();
         blob.constrain();
     }
-
     //iterate through the food array to get the food
     for (let i = food.length-1; i >= 0; i--) {
         food[i].show();
