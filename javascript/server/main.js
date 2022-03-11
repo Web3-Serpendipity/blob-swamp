@@ -1,11 +1,13 @@
 const {insert, pick_random} = require("./util.js");
 const {Vector} = require("./vector.js");
 
-const {RPC_URL, WALLET_SEED, CONTRACT_ADDRESS, WALLET_ADDRESS} = require('./../../../constants.js');
+const {RPC_URL, WALLET_SEED, CONTRACT_ADDRESS, WALLET_ADDRESS} = require('./constants.js');
 const {DESC_DB, COLOR_DB} = require('./blob_params_db.js');
 
 const {createServer} = require("http");
 const {Server} = require("socket.io");
+
+const { ethers } = require("ethers");
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
