@@ -1,15 +1,18 @@
+import 
+
 var expect = require('chai').expect
 describe('#login()', function() {
 
   // add a test hook
   beforeEach(function() {
     // ...some logic before each test is run
+    let blob = new Blob
   })
   
   // test a functionality
   it('should see the Connect Wallet button', function() {
     // add an assertion
-    expect(sum(1, 2, 3, 4, 5)).to.equal(15);
+    expect(blob.to.not.equal(null));
     expect(sum(1, 2, 3, 4, 5)).to.equal(15);
   })
   
