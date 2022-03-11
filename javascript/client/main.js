@@ -10,13 +10,16 @@ if (isMetamaskInstalled) {
 // A Web3Provider wraps a standard Web3 provider, which is
 // what MetaMask injects as window.ethereum into each page
 const provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
-
+console.log(provider)
+let blockNum = await provider.getBlockNumber()
+console.log(blockNum)
 // MetaMask requires requesting permission to connect users accounts
 
 // The MetaMask plugin also allows signing transactions to
 // send ether and pay to change state within the blockchain.
 // For this, you need the account signer...
 const signer = provider.getSigner()
+console.log(signer)
 
 const connectWalletBtn = document.querySelector('#connect-wlt-btn')
 let blob;
@@ -175,9 +178,7 @@ function randomHex() {
     return Math.floor(Math.random() * 256)
 }
 
-joinButton.addEventListener('click', () => {
-    
-})
+//
 
 document.getElementById('close-modal-btn').addEventListener('click', () => {
     let modal = document.querySelector('#join-game-modal')
@@ -197,5 +198,6 @@ joinBtn.addEventListener('click', function(event) {
 
 connectWalletBtn.addEventListener('click', async () => {
     await provider.send("eth_requestAccounts", []);
+    new Toast({message: 'Welcome to Toast.js!'});
     console.log(signer)
 })
