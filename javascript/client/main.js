@@ -72,32 +72,6 @@ socket.on("GameUpdate", (contents) => {
 // Food will be instantiated by the server - an array 
 // will be sent over when the canvas is first drawn - foodEaten events will also be sent
 // by the server when a blob feasts
-<<<<<<< HEAD
-function setup(x_pos, y_pos) {
-    // createCanvas(1000, 1000);
-    // let canvasSize = (activePlayers.length + 1) * 100
-    // console.log(activePlayers.length)
-    // console.log(canvasSize)
-    // createCanvas(1000, 1000);
-
-    let w = x_pos || random(width)
-    let h = y_pos || random(height)
-    blob = new Blob(w, h, 64);
-    activePlayers.push(blob)
-    // npb = new Blob(rw + 130, rh + 130, 80);
-    // activePlayers.push(npb)
-
-    for (let i = 0; i < 10; i++) {
-        activePlayers[i] = new Blob(random(width), random(height), 64)
-    }
-
-    //player blob data
-    data = {
-        x: blob.pos.x,
-        y: blob.pos.y,
-        r: blob.r
-    }
-=======
 function setup() {
     createCanvas(windowWidth, windowHeight);
     socket.emit("PlayerJoinRequest", 0 , (id, px, py) => {
@@ -107,7 +81,6 @@ function setup() {
         ply.model.pos.x = px;
         ply.model.pos.y = py;
     });
->>>>>>> main
 
     for (let i = 0; i < 100; i++) {
         //positions will need to be fed from server
@@ -116,12 +89,6 @@ function setup() {
         //this can prolly be kept to show food from server
         food[i] = new Blob(x, y, 15);
     }
-<<<<<<< HEAD
-
-    
-    
-=======
->>>>>>> main
 }
 
 // Main Game Loop
@@ -146,15 +113,7 @@ function draw() {
         blob.update();
         blob.constrain();
     }
-
-<<<<<<< HEAD
-    blob.show();
-    blob.update();
-    blob.constrain();
-
-=======
     //iterate through the food array to get the food
->>>>>>> main
     for (let i = food.length-1; i >= 0; i--) {
         food[i].show();
         if (localModel.eats(food[i])) {
@@ -199,13 +158,8 @@ function Blob(x, y, r) {
     }
 
     this.constrain = function () {
-<<<<<<< HEAD
-        blob.pos.x = constrain(blob.pos.x, -width, width)
-        blob.pos.y = constrain(blob.pos.y, -height, height)
-=======
         this.pos.x = constrain(this.pos.x, -width, width)
         this.pos.y = constrain(this.pos.y, -height, height)
->>>>>>> main
     }
 
     let red = randomHex()
