@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "mocha": "^9.2.2"
+  }
+}
