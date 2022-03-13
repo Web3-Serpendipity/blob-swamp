@@ -31,9 +31,25 @@ async function getBlobMetadata(tokenId) {
   return await nfts.findOne({_id: tokenId});
 }
 
+async function getSignerAddressAndNonce(message, signedMessage){
+    const signerAddress = ethers.utils.verifyMessage(message, signedMessage);
+
+    const addressFromMessage = message.replace(/\n|\r/g, "").split("Wallet address:").pop().split("Nonce:")[0].trim();
+
+    const nonce = message.split("Nonce:").pop().trim();
+  
+    if(signerAddressA !== signerAddressB){
+        // this means that the message was not signed
+    }
+
+    return {address: signerAddressA, nonce: Number(nonce)}
+}
+
 io.on("connection", (socket) => {
   let playerId = null;
   let playerWallet; // TODO: get playerWallet from login
+
+  //socket.on('PlayerLogin', async ())
 
   function player() {
     return players[playerId];
@@ -264,7 +280,7 @@ app.get('/blobInfo/:id', async (req, res) => {
 var server = app.listen(8081, function () {
    var host = server.address().address
    var port = server.address().port
-   console.log("blobInfo listening @ http://%s:%s", host, port)
+   console.log("nft metadata service blobInfo listening @ http://%s:%s", host, port)
 })
 
 //
