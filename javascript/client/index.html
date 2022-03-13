@@ -7,10 +7,13 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Monoton&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <link rel="stylesheet" href="styles.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script async src="p5.js"></script>
-        <script async src="main.js"></script>
+        <script async src="main.js" type="module"></script>
         <script type="module">
             import { io } from "https://cdn.socket.io/4.3.2/socket.io.esm.min.js";
           </script>
@@ -24,10 +27,19 @@
                     <button id="close-modal-btn">X</button>
             </div>
             <div class="info-fields">
-                <h2>Welcome to Blob Wars</h2>
-                <p>Please connect your wallet to begin.</p>
-                <button>Connect Wallet</button>
-                <button id="joinButton" name="joinButton" class="active">Join Game</button>
+                <h2>Welcome to Blob Wars!</h2>
+                <p>Please connect MetaMask wallet</p>
+                <button id="connect-wlt-btn">Connect Wallet</button>
+            </div>
+            <div>
+                <h2>Choose a name for your blob!</h2>
+                <p>Please note, this cannot be changed later.</p>
+                <form action="#">
+                    <input type="text" id="blob-name-input" class="name-input" placeholder="Your Blob Name" required>
+                </form>
+            </div>
+            <div>
+                <button id="join-btn" name="joinButton" class="active">Join Game</button>
             </div>
         </div>
     </body>
