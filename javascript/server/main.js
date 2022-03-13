@@ -17,9 +17,9 @@ const io = new Server(httpServer, {
 });
 
 io.use(function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', "*")
-  res.header('Access-Control-Allow-Methos', "GET,PUT,POST,DELETE")
-  res.header('Access-Control-Allow-Origin', 'Content-Type')
+  res.header('Access-Control-Allow-Origin', "*");
+  res.header('Access-Control-Allow-Methos', "GET,PUT,POST,DELETE");
+  res.header('Access-Control-Allow-Origin', 'Content-Type');
 })
 
 io.listen(3000);
@@ -94,8 +94,9 @@ io.on("connection", (socket) => {
   }
 
   socket.on("PlayerJoinRequest", async (tokenId, callback) => {
+    console.log(`PlayerJoinRequest player #${playerId}, token #${tokenId}`);
     let r = await isBlobStaked(tokenId);
-    if (!r) {return;}
+    if (!r) {console.log(`blob #${tokenId} is not staked`); return;}
 
     let playerData = {
       pos: new Vector(Math.floor(Math.random()*field_w), Math.floor(Math.random()*field_h)),
@@ -107,8 +108,6 @@ io.on("connection", (socket) => {
     playerData.id = insert(players, playerData);
     playerData.Kick = Kick;
     playerId = playerData.id;
-
-    console.log('PlayerJoinRequest', playerId, playerData);
 
     io.emit("PlayerJoined", playerData.id, playerData.blob);
     callback(playerData.id, playerData.pos.x, playerData.pos.y);
@@ -285,9 +284,9 @@ app.get('/blobInfo/:id', async (req, res) => {
 })
 
 var server = app.listen(8081, function () {
-   var host = server.address().address
-   var port = server.address().port
-   console.log("nft metadata service blobInfo listening @ http://%s:%s", host, port)
+   var host = server.address().address;
+   var port = server.address().port;
+   console.log("nft metadata service blobInfo listening @ http://%s:%s", host, port);
 })
 
 //
