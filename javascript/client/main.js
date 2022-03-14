@@ -35,7 +35,7 @@ const joinButton = document.querySelector("#joinButton")
 //set parameters for arena
 let playerID;
 let vx,vy;
-const socket = io("http://localhost:3000", {transports: ['websocket']});
+const socket = io("http://localhost:3001");
 
 let players = [];
 
@@ -75,8 +75,10 @@ socket.on("GameUpdate", (contents) => {
 // Food will be instantiated by the server - an array 
 // will be sent over when the canvas is first drawn - foodEaten events will also be sent
 // by the server when a blob feasts
+// console.log(windowWidth)
 function setup() {
-    createCanvas(windowWidth, windowHeight);
+    createCanvas(1000, 1000);
+    console.log('canvas created')
     socket.emit("PlayerJoinRequest", 0 , (id, px, py) => {
         console.log('PlayerJoinRequest response', id, px, py);
         playerID = id;
