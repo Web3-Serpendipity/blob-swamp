@@ -1,0 +1,26 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    margin: .5em auto;
+    text-align: center;
+    font-size: 5rem;
+    font-family: 'Monoton', cursive;
+    color: green;
+}
+
+#join-game-modal {
+    position: absolute;
+    padding: 1em;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: pink;
+}
+
+.modal-title {
+    display: flex;
+    justify-content: space-between;
+}
