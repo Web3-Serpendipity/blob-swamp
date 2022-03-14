@@ -10,6 +10,7 @@ const {Server} = require("socket.io");
 const { ethers } = require("ethers");
 
 const httpServer = createServer();
+console.log(httpServer)
 const io = new Server(httpServer, {
   cors: {
     origin: "*", //"https://localhost:3000"
@@ -17,13 +18,12 @@ const io = new Server(httpServer, {
 });
 
 
-io.use(function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', "*");
-  res.header('Access-Control-Allow-Methods', "GET,PUT,POST,DELETE");
-  res.header('Access-Control-Allow-Origin', 'Content-Type');
-})
+// io.use(function(req, res, next) {
+//   res.header('Access-Control-Allow-Origin', "*");
+//   res.header('Access-Control-Allow-Methods', "GET,PUT,POST,DELETE");
+//   res.header('Access-Control-Allow-Origin', 'Content-Type');
+// })
 
-httpServer.listen(3001);
 
 // Connect to MongoDB
 //
@@ -202,6 +202,9 @@ io.on("connection", (socket) => {
 
   console.log('Player has successfully connected.');
 })
+
+httpServer.listen(3001);
+
 
 // Spawn the food
 
