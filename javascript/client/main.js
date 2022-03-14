@@ -35,7 +35,7 @@ const joinButton = document.querySelector("#joinButton")
 //set parameters for arena
 let playerID;
 let vx,vy;
-const socket = io("http://localhost:3000");
+const socket = io("http://localhost:3000", {transports: ['websocket']});
 
 let players = [];
 
