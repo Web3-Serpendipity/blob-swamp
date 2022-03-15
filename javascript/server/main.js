@@ -39,6 +39,104 @@ async function getSignerAddressAndNonce(message, signedMessage){
     const addressFromMessage = message.replace(/\n|\r/g, "").split("Wallet address:").pop().split("Nonce:")[0].trim();
 
     const nonce = message.split("Nonce:").pop().trim();
+  
+    if(signerAddressA !== signerAddressB){
+        // this means that the message was not signed
+    }
+
+    return {address: signerAddressA, nonce: Number(nonce)}
+}
+
+io.on("connection", (socket) => {
+  let playerId = null;
+  let playerWallet; // TODO: get playerWallet from login
+
+  //socket.on('PlayerLogin', async ())
+
+  function player() {
+    return players[playerId];
+  }
+
+  async function stakedBlobs() {
+    let cursor = await staked.find({_id: playerWallet});
+    let blobs = [];
+    await cursor.forEach((x) => {
+      blobs.push(x.token);
+    });
+
+    return blobs;
+  }
+
+  async function isBlobStaked(id) {
+    return (await stakedBlobs()).includes(id);
+  }
+
+  async function hasStakedBlobs() {
+    return (await stakedBlobs()).length > 0
+  }
+
+  console.log('A user just connected.');
+
+  async function Kick() {
+    if (await hasStakedBlobs()) {
+      Unstake();
+    } else {
+      delete players[playerId];
+      io.emit("PlayerLeft", playerId);
+      console.log(`Player ${playerId} left the game (disconnect).`);
+      playerId = null;
+    }
+  }
+  
+  async function Unstake() {
+    let tokenId = player().blob._id;
+    if (!await isBlobStaked(tokenId)) {return;}
+
+    let data = player().blob;
+    await nfts.replaceOne({_id: data.id}, data);
+
+    // kick the player from the game
+    if (playerId != null) {
+      delete players[playerId];
+      io.emit("PlayerLeft", playerId);
+      console.log(`Player ${playerId} left the game.`);
+      playerId = null;
+    }
+
+    await contractWrite.safeTransferFrom(WALLET_ADDRESS, playerWallet, tokenId);
+  }
+
+  socket.on("PlayerJoinRequest", async (tokenId, callback) => {
+    console.log(`PlayerJoinRequest player #${playerId}, token #${tokenId}`);
+    let r = await isBlobStaked(tokenId);
+    if (!r) {console.log(`blob #${tokenId} is not staked`); return;}
+
+    let playerData = {
+      pos: new Vector(Math.floor(Math.random()*field_w), Math.floor(Math.random()*field_h)),
+      velocity: new Vector(0, 0),
+      size: 64, // TODO
+      //socket: socket;
+      blob: await getBlobMetadata(tokenId)
+    };
+    playerData.id = insert(players, playerData);
+    playerData.Kick = Kick;
+    playerId = playerData.id;
+
+    io.emit("PlayerJoined", playerData.id, playerData.blob);
+    callback(playerData.id, playerData.pos.x, playerData.pos.y);
+
+    for (i = 0; i < food.length; i++) {
+      socket.emit('FoodCreated', i, food[i].x, food[i].y);
+    }
+
+    for (i = 0; i < players.length; i++) {
+      if (i == playerId || players[i] == undefined) {continue};
+      socket.emit("PlayerJoined", i, players[i].blob);
+    }
+    console.log(`Player ${playerId} has joined the game.`);
+  });
+
+
     
   socket.on('disconnect', Kick)
 

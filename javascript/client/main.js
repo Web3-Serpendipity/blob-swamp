@@ -37,6 +37,7 @@ let vx,vy;
 const socket = io("http://localhost:8081");
 
 let players = [];
+console.log("players", players)
 
 function player() {
     return players[playerID];
@@ -93,54 +94,43 @@ const s = ( sketch ) => {
     };
 
     sketch.draw = () => {
-        sketch.background(0);
-        sketch.fill(255);
-        sketch.rect(x,y,50,50);
-    };
+        console.log("draw function player is undefined:", player())
+        if (player() == undefined) {return};
+        let localModel = player().model;
+    
+        sketch.translate(width/2, height/2)
+        let newZoom = 64 / localModel.r;
+        zoom = lerp(zoom, newZoom, .1)
+        sketch.scale(zoom)
+        sketch.translate(-localModel.pos.x, -localModel.pos.y)
+        localModel.control();
+    
+        console.log("players", players)
+        for (let i = 0; i < players.length; i++) {
+            if (players[i] == undefined) {
+                console.log("break due to no id");
+                continue;
+            };
+            let blob = players[i].model;
 
+            blob.show();
+            console.log('blob shown')
+            blob.update();
+            console.log('blob updated')
+            
+            blob.constrain();
+        }
+        //iterate through the food array to get the food
+        for (let i = food.length-1; i >= 0; i--) {
+            food[i].show();
+            if (localModel.eats(food[i])) {
+                //pushes food eaten to array that can be sent to server
+                foodEaten.push(i)
+                food.splice(i, 1)
+            }
+        }
+    }
 };
-
-let inst_p5 = new p5(s);
-
-// Main Game Loop
-function draw() {
-    background(0);
-
-    if (player() == undefined) {return};
-    let localModel = player().model;
-
-    translate(width/2, height/2)
-    let newZoom = 64 / localModel.r;
-    zoom = lerp(zoom, newZoom, .1)
-    scale(zoom)
-    translate(-localModel.pos.x, -localModel.pos.y)
-    localModel.control();
-
-    for (let i = 0; i < players.length; i++) {
-        if (players[i] == undefined) {continue};
-        let blob = players[i].model;
-        blob.show();
-        blob.update();
-        blob.constrain();
-    }
-    //iterate through the food array to get the food
-    for (let i = food.length-1; i >= 0; i--) {
-        food[i].show();
-        if (localModel.eats(food[i])) {
-            //pushes food eaten to array that can be sent to server
-            foodEaten.push(i)
-            // console.log(foodEaten)
-            food.splice(i, 1)
-
-        }
-    }
-    // Check to see if blobs are eating each other
-    /*for (let i = activePlayers.length-1; i >= 0; i--) {
-        if (blob.eats(activePlayers[i])) {
-            activePlayers.splice(i, 1)
-        }
-    }*/
-}
 
 function Blob(x, y, r) {
     this.pos = createVector(x, y);
@@ -179,13 +169,16 @@ function Blob(x, y, r) {
         fill(red, green, blue)
         ellipse(this.pos.x, this.pos.y, this.r*2, this.r*2)
     }
-}
+};
+
+let inst_p5 = new p5(s);
+inst_p5.setup();
+inst_p5.draw();
+
 
 function randomHex() {
     return Math.floor(Math.random() * 256)
 }
-
-//
 
 document.getElementById('close-modal-btn').addEventListener('click', () => {
     let modal = document.querySelector('#join-game-modal')
@@ -210,8 +203,6 @@ socket.emit("PlayerJoinRequest", 0 , (id, px, py) => {
     ply.model.pos.y = py;
 });
 
-
-setup();
 
 connectWalletBtn.addEventListener('click', async () => {
     await provider.send("eth_requestAccounts", []);
