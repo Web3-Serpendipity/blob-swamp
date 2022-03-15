@@ -1,5 +1,5 @@
 // import { ethers } from "https://cdn.ethers.io/lib/ethers-5.2.esm.min.js";
-// var p5_2 = new p5();
+var p5_2 = new p5();
 var isMetamaskInstalled = () => ethereum.isMetamaskInstalled
 if (isMetamaskInstalled) {
     console.log('Metamask is installed!')
@@ -11,7 +11,7 @@ if (isMetamaskInstalled) {
 const provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
 console.log(provider)
 let blockNum = await provider.getBlockNumber()
-console.log(blockNum)
+
 // MetaMask requires requesting permission to connect users accounts
 
 // The MetaMask plugin also allows signing transactions to
@@ -75,6 +75,20 @@ socket.on("GameUpdate", (contents) => {
 // will be sent over when the canvas is first drawn - foodEaten events will also be sent
 // by the server when a blob feasts
 
+function setup() {
+    createCanvas(windowWidth, windowHeight);
+    console.log('canvas created')
+    background(0);
+    console.log('background created')
+
+    // for (let i = 0; i < 100; i++) {
+    //     //positions will need to be fed from server
+    //     let x = random(-width,width)
+    //     let y = random(-height,height)
+    //     //this can prolly be kept to show food from server
+    //     food[i] = new Blob(x, y, 15);
+    // }
+}
 
 // Main Game Loop
 function draw() {
@@ -184,21 +198,6 @@ socket.emit("PlayerJoinRequest", 0 , (id, px, py) => {
     ply.model.pos.y = py;
 });
 
-function setup() {
-    createCanvas(600, 600);
-    console.log('canvas created')
-    background(0);
-    console.log('background set')
-    
-
-    for (let i = 0; i < 100; i++) {
-        //positions will need to be fed from server
-        let x = random(-width,width)
-        let y = random(-height,height)
-        //this can prolly be kept to show food from server
-        food[i] = new Blob(x, y, 15);
-    }
-}
 
 setup();
 
