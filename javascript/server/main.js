@@ -1,378 +1,241 @@
-// const {insert, pick_random} = require("./util.js");
-// const {Vector} = require("./vector.js");
+var express = require('express');
+var app = express();
 
-// const {RPC_URL, WALLET_SEED, CONTRACT_ADDRESS, WALLET_ADDRESS} = require('./constants.js');
-// const {DESC_DB, COLOR_DB} = require('./blob_params_db.js');
-const express = require('express') // Importing Express
-const app = express() // Creating Express Server
-const path = require('path');
-// Creating Http Server from Express App to work with socket.io
-const http = require('http').Server(app);
-// Initializing socket.io object
-const io = require('socket.io')(http,{
- // Specifying CORS 
- cors: {
- origin: '*',
- }
-})
-// const {createServer} = require("http");
-// const {Server} = require("socket.io");
+const { insert, pick_random} = require("./util.js");
+const { Vector} = require("./vector.js");
 
-// // const { ethers } = require("ethers");
+const { RPC_URL, WALLET_SEED, CONTRACT_ADDRESS, WALLET_ADDRESS} = require('./constants.js');
+const { DESC_DB, COLOR_DB} = require('./blob_params_db.js');
 
-// const httpServer = createServer();
-// const io = new Server(httpServer, {});
+const {createServer} = require("http");
+const {Server} = require("socket.io");
 
-const host = 'localhost';
-const port = 8000;
-app.use(express.urlencoded({ extended: true })) // Specifying to use urlencoded
-// Creating object of Socket
-const liveData = io.of("/liveData") // URL which will accept socket connection
-// Socket event
-liveData.on("user-connected",(username)=>{
- console.log(`Receiver ${username} connected..`) // Logging when user is connected
+const { ethers } = require("ethers");
+
+const httpServer = createServer();
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*", //"https://localhost:3000"
+  }
 });
-// Get request on home page
-app.get('/', (req, res) => {
-  root: path.join(__dirname, './')
-});
-// Post request on home page
-app.post('/',(req, res) => {
- liveData.emit("new-data",req.body.message) // Emitting event.
+
+let players = [];
+let food = [];
+let nfts;
+let staked;
+let contractWrite;
+const field_w = 1000;
+const field_h = 1000;
+const tickrate = 10;
+const food_size = 15;
+
+async function getBlobMetadata(tokenId) {
+  return await nfts.findOne({_id: tokenId});
+}
+
+async function getSignerAddressAndNonce(message, signedMessage){
+    const signerAddress = ethers.utils.verifyMessage(message, signedMessage);
+
+    const addressFromMessage = message.replace(/\n|\r/g, "").split("Wallet address:").pop().split("Nonce:")[0].trim();
+
+    const nonce = message.split("Nonce:").pop().trim();
+    
+  socket.on('disconnect', Kick)
+
+  socket.on("PlayerLeaveRequest", () => {
+    Unstake()
+    /*delete players[playerId];
+    io.emit("PlayerLeft", playerId);
+    console.log(`Player ${playerId} left the game.`);
+    playerId = null;*/
+  })
+
+  socket.on('PlayerUpdate', (px, py, vx, vy) => {
+    let newpos = new Vector(px, py);
+    let newvel = new Vector(vx, vy);
+
+    //if (newvel.lengthsqr() > 9) {
+    //  console.log(`Discarded PlayerUpdate from ${playerId} (velocity manipulation)`);
+    //  return; // discard the update
+    //};
+
+    //if (newpos.distancesqr(player().pos) > 25) {
+    //  console.log(`Discarded PlayerUpdate from ${playerId} (position manipulation)`);
+    //  console.log('old', player().pos, 'new', newpos);
+    //  return; // discard the update
+    //};
+
+    player().pos = newpos;
+    player().velocity = newvel;
+  })
+
+  console.log('Player has successfully connected.');
 })
-// Listening on Host and Port
-http.listen(port, host, () => console.log(`Listening on http://${host}:${port}/`))
-//   reconnectionDelay: 1000,
-//   reconnection: true,
-//   reconnectionAttemps: 10,
-//   transports: ['websocket'],
-//   agent: false,
-//   upgrade: false,
-//   rejectUnauthorized: false,
-//    cors: {
-//     origin: ["http://localhost:3000"]
-//    }
-// });
 
-//   io.use(function(req, res, next) {
-//   res.header('Access-Control-Allow-Origin', "*");
-//   res.header('Access-Control-Allow-Methods', "GET,PUT,POST,DELETE");
-//   res.header('Access-Control-Allow-Origin', 'Content-Type');
-// })
+// Spawn the food
 
-// io.listen(8081);
+function spawnFood(n) {
+  for (let i = 0; i < n; i++) {
+    //positions will need to be fed from server
+    let x = -field_w + Math.random()*field_w*2;
+    let y = -field_h + Math.random()*field_h*2;
+    //this can prolly be kept to show food from server
+    food[i] = new Vector(x, y); // radius=15
+    io.emit('FoodCreated', i, food[i].x, food[i].y);
+  }
+}
+spawnFood(100);
 
-// let players = [];
-// let food = [];
-// let nfts;
-// let staked;
-// let contractWrite;
-// const field_w = 1000;
-// const field_h = 1000;
-// const tickrate = 10;
-// const food_size = 15;
+httpServer.listen(3000);
 
-// async function getBlobMetadata(tokenId) {
-//   return await nfts.findOne({_id: tokenId});
-// }
+// Start the main game loop
 
-// async function getSignerAddressAndNonce(message, signedMessage){
-//     const signerAddress = ethers.utils.verifyMessage(message, signedMessage);
+function getPredator(p1, p2) {
+  return (p1.size > p2.size && [p1, p2]) || (p2.size > p1.size && [p2, p1]) || [null, null];
+}
 
-//     const addressFromMessage = message.replace(/\n|\r/g, "").split("Wallet address:").pop().split("Nonce:")[0].trim();
+function game_loop() {
+  removed_food = 0;
 
-//     const nonce = message.split("Nonce:").pop().trim();
-  
-//     if(signerAddressA !== signerAddressB){
-//         // this means that the message was not signed
-//     }
+  // Check food eating
+  for (i = 0; i < food.length; i++) {
+    if (food[i] == undefined) {break};
 
-//     return {address: signerAddressA, nonce: Number(nonce)}
-// }
+    for (j = 0; j < players.length; j++) {
+      let ply = players[j]
+      if (ply.pos.distancesqr(food[i]) < (ply.size + 15)**2) {
+        food.splice(i, 1);
 
-// io.on("connection", (socket) => {
-//   let playerId = null;
-//   let playerWallet; // TODO: get playerWallet from login
+        let sum = Math.PI * ply.size * ply.size + Math.PI * 15 * 15;
+        ply.size = Math.sqrt(sum / Math.PI);
 
-//   //socket.on('PlayerLogin', async ())
+        io.emit('FoodEaten', i);
+        i--;
+        removed_food += 1;
+      }
+    }
+  }
 
-//   function player() {
-//     return players[playerId];
-//   }
+  // Respawn eaten food
+  spawnFood(removed_food);
 
-//   async function stakedBlobs() {
-//     let cursor = await staked.find({_id: playerWallet});
-//     let blobs = [];
-//     await cursor.forEach((x) => {
-//       blobs.push(x.token);
-//     });
+  // TODO: Check eating of other blobs
+  dead_players = [];
+  for (i = 0; i < players.length; i++) {
+    let ply1 = players[i];
+    if (ply1 == undefined) {continue};
 
-//     return blobs;
-//   }
+    for (j = 0; j < players.length; j++) {
+      let ply2 = players[j]
+      if (ply1.pos.distancesqr(ply2.pos) < (ply1.size + ply2.size)**2) {
+        let [att, vict] = getPredator(ply1, ply2);
+        if (att == null) {continue};
 
-//   async function isBlobStaked(id) {
-//     return (await stakedBlobs()).includes(id);
-//   }
+        let sum = Math.PI * att.size * att.size + Math.PI * vict.size * vict.size;
+        att.size = sqrt(sum / Math.PI);
 
-//   async function hasStakedBlobs() {
-//     return (await stakedBlobs()).length > 0
-//   }
+        if (!dead_players.includes(vict)) {
+          dead_players.push(vict);
+        }
+      }
+    }
+  }
 
-//   console.log('A user just connected.');
+  dead_players.forEach((p) => {p.Kick()});
 
-//   async function Kick() {
-//     if (await hasStakedBlobs()) {
-//       Unstake();
-//     } else {
-//       delete players[playerId];
-//       io.emit("PlayerLeft", playerId);
-//       console.log(`Player ${playerId} left the game (disconnect).`);
-//       playerId = null;
-//     }
-//   }
+  // broadcast the game update to all clients
+  let contents = [];
+  for (i = 0; i < players.length; i++) {
+    let data = players[i];
+    if (data != undefined) {
+      contents.push([data.id, data.pos.x, data.pos.y, data.velocity.x, data.velocity.y, data.size]);
+    }
+  }
 
-//   socket.on("PlayerJoinRequest", async (tokenId, callback) => {
-//     console.log(`PlayerJoinRequest player #${playerId}, token #${tokenId}`);
-//     let r = await isBlobStaked(tokenId);
-//     if (!r) {console.log(`blob #${tokenId} is not staked`); return;}
+  io.emit("GameUpdate", contents);
+}
+setInterval(game_loop, (1000/tickrate));
 
-//     let playerData = {
-//       pos: new Vector(Math.floor(Math.random()*field_w), Math.floor(Math.random()*field_h)),
-//       velocity: new Vector(0, 0),
-//       size: 64, // TODO
-//       //socket: socket;
-//       blob: await getBlobMetadata(tokenId)
-//     };
-//     playerData.id = insert(players, playerData);
-//     playerData.Kick = Kick;
-//     playerId = playerData.id;
+//
+// Connect to MongoDB
+//
 
-//     io.emit("PlayerJoined", playerData.id, playerData.blob);
-//     callback(playerData.id, playerData.pos.x, playerData.pos.y);
-
-//     for (i = 0; i < food.length; i++) {
-//       socket.emit('FoodCreated', i, food[i].x, food[i].y);
-//     }
-
-//     for (i = 0; i < players.length; i++) {
-//       if (i == playerId || players[i] == undefined) {continue};
-//       socket.emit("PlayerJoined", i, players[i].blob);
-//     }
-//     console.log(`Player ${playerId} has joined the game.`);
-//   });
-
-//   async function Unstake() {
-//     let tokenId = player().blob._id;
-//     if (!await isBlobStaked(tokenId)) {return;}
-
-//     let data = player().blob;
-//     await nfts.replaceOne({_id: data.id}, data);
-
-//     // kick the player from the game
-//     if (playerId != null) {
-//       delete players[playerId];
-//       io.emit("PlayerLeft", playerId);
-//       console.log(`Player ${playerId} left the game.`);
-//       playerId = null;
-//     }
-
-//     await contractWrite.safeTransferFrom(WALLET_ADDRESS, playerWallet, tokenId);
-//   }
+const MongoClient = require("mongodb").MongoClient;
     
-//   socket.on('disconnect', Kick)
+const url = "mongodb://localhost:27017/";
+const mongoClient = new MongoClient(url);
+let db;
+async function mongoSetup() {
+  await mongoClient.connect();
+  db = mongoClient.db("blobwars");
+  nfts = db.collection("nfts");
+  staked = db.collection("staked");
+  console.log('mongo connected')
+}
+mongoSetup();
 
-//   socket.on("PlayerLeaveRequest", () => {
-//     Unstake()
-//     /*delete players[playerId];
-//     io.emit("PlayerLeft", playerId);
-//     console.log(`Player ${playerId} left the game.`);
-//     playerId = null;*/
-//   })
 
-//   socket.on('PlayerUpdate', (px, py, vx, vy) => {
-//     let newpos = new Vector(px, py);
-//     let newvel = new Vector(vx, vy);
 
-//     //if (newvel.lengthsqr() > 9) {
-//     //  console.log(`Discarded PlayerUpdate from ${playerId} (velocity manipulation)`);
-//     //  return; // discard the update
-//     //};
+// nft api
 
-//     //if (newpos.distancesqr(player().pos) > 25) {
-//     //  console.log(`Discarded PlayerUpdate from ${playerId} (position manipulation)`);
-//     //  console.log('old', player().pos, 'new', newpos);
-//     //  return; // discard the update
-//     //};
+app.get('/blobInfo/:id', async (req, res) => {
+  let qr = await getBlobMetadata(req.params.id);
+  console.log('blobInfo call', qr);
+  res.end(JSON.stringify(qr));
+})
 
-//     player().pos = newpos;
-//     player().velocity = newvel;
-//   })
+var server = app.listen(8081, function () {
+   var host = server.address().address;
+   var port = server.address().port;
+   console.log("nft metadata service blobInfo listening @ http://%s:%s", host, port);
+})
 
-//   console.log('Player has successfully connected.');
-// })
+//
+// Connect the wallet
+//
 
-// // Spawn the food
+// If you don't specify a //url//, Ethers connects to the default 
+// (i.e. ``http:/\/localhost:8545``)
+const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
+const signer = ethers.Wallet.fromMnemonic(WALLET_SEED).connect(provider);
 
-// function spawnFood(n) {
-//   for (let i = 0; i < n; i++) {
-//     //positions will need to be fed from server
-//     let x = -field_w + Math.random()*field_w*2;
-//     let y = -field_h + Math.random()*field_h*2;
-//     //this can prolly be kept to show food from server
-//     food[i] = new Vector(x, y); // radius=15
-//     io.emit('FoodCreated', i, food[i].x, food[i].y);
-//   }
-// }
-// spawnFood(100);
+const contract = new ethers.Contract(CONTRACT_ADDRESS, [
+  "function safeTransferFrom(address from, address to, uint256 tokenId) public",
+  "event Transfer(address from, address to, uint256 tokenId)",
+  "event BlobBought(address player, uint256 tokenId)",
+  "function tokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256)",
+  "function balanceOf(address owner) external view returns (uint256 balance)",
+  "function buyBlob() external payable" // balanceOf, tokenOfOwnerByIndex
+], provider);
 
-// // Start the main game loop
+contractWrite = contract.connect(signer);
 
-// function getPredator(p1, p2) {
-//   return (p1.size > p2.size && [p1, p2]) || (p2.size > p1.size && [p2, p1]) || [null, null];
-// }
+contract.on('BlobBought', async (player, tokenId) => {
+  await nfts.insertOne({
+    _id: tokenId,
+    name: "Unnamed",
+    description: pick_random(DESC_DB),
+    color: pick_random(COLOR_DB),
+    size: 7 + Math.floor(Math.random()*9),
+    dead: false,
+    image: "https://static.wikia.nocookie.net/meme/images/7/7e/Ytroll-troll-crazy-insane.png" // TODO
+  });
+})
 
-// function game_loop() {
-//   removed_food = 0;
+contract.on('Transfer', async (from, to, tokenId) => {
+  if (to == WALLET_ADDRESS) {
+    await staked.insertOne({
+      _id: from,
+      token: tokenId
+    });
+  } else if (from == WALLET_ADDRESS) {
+    await staked.deleteOne({
+      _id: to,
+      token: tokenId
+    })
+  } else {
+    return;
+  }
+})
 
-//   // Check food eating
-//   for (i = 0; i < food.length; i++) {
-//     if (food[i] == undefined) {break};
-
-//     for (j = 0; j < players.length; j++) {
-//       let ply = players[j]
-//       if (ply.pos.distancesqr(food[i]) < (ply.size + 15)**2) {
-//         food.splice(i, 1);
-
-//         let sum = Math.PI * ply.size * ply.size + Math.PI * 15 * 15;
-//         ply.size = Math.sqrt(sum / Math.PI);
-
-//         io.emit('FoodEaten', i);
-//         i--;
-//         removed_food += 1;
-//       }
-//     }
-//   }
-
-//   // Respawn eaten food
-//   spawnFood(removed_food);
-
-//   // TODO: Check eating of other blobs
-//   dead_players = [];
-//   for (i = 0; i < players.length; i++) {
-//     let ply1 = players[i];
-//     if (ply1 == undefined) {continue};
-
-//     for (j = 0; j < players.length; j++) {
-//       let ply2 = players[j]
-//       if (ply1.pos.distancesqr(ply2.pos) < (ply1.size + ply2.size)**2) {
-//         let [att, vict] = getPredator(ply1, ply2);
-//         if (att == null) {continue};
-
-//         let sum = Math.PI * att.size * att.size + Math.PI * vict.size * vict.size;
-//         att.size = sqrt(sum / Math.PI);
-
-//         if (!dead_players.includes(vict)) {
-//           dead_players.push(vict);
-//         }
-//       }
-//     }
-//   }
-
-//   dead_players.forEach((p) => {p.Kick()});
-
-//   // broadcast the game update to all clients
-//   let contents = [];
-//   for (i = 0; i < players.length; i++) {
-//     let data = players[i];
-//     if (data != undefined) {
-//       contents.push([data.id, data.pos.x, data.pos.y, data.velocity.x, data.velocity.y, data.size]);
-//     }
-//   }
-
-//   io.emit("GameUpdate", contents);
-// }
-// setInterval(game_loop, (1000/tickrate));
-
-// //
-// // Connect to MongoDB
-// //
-
-// // const MongoClient = require("mongodb").MongoClient;
-    
-// // const url = "mongodb://localhost:27017/";
-// // const mongoClient = new MongoClient(url);
-// // let db;
-// // async function mongoSetup() {
-// //   await mongoClient.connect();
-// //   db = mongoClient.db("blobwars");
-// //   nfts = db.collection("nfts");
-// //   staked = db.collection("staked");
-// // }
-// // mongoSetup();
-
-// // var express = require('express');
-// // var app = express();
-
-// // // nft api
-
-// // app.get('/blobInfo/:id', async (req, res) => {
-// //   let qr = await getBlobMetadata(req.params.id);
-// //   console.log('blobInfo call', qr);
-// //   res.end(JSON.stringify(qr));
-// // })
-
-// // var server = app.listen(8081, function () {
-// //    var host = server.address().address;
-// //    var port = server.address().port;
-// //    console.log("nft metadata service blobInfo listening @ http://%s:%s", host, port);
-// // })
-
-// //
-// // Connect the wallet
-// //
-
-// // If you don't specify a //url//, Ethers connects to the default 
-// // (i.e. ``http:/\/localhost:8545``)
-// const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
-// const signer = ethers.Wallet.fromMnemonic(WALLET_SEED).connect(provider);
-
-// const contract = new ethers.Contract(CONTRACT_ADDRESS, [
-//   "function safeTransferFrom(address from, address to, uint256 tokenId) public",
-//   "event Transfer(address from, address to, uint256 tokenId)",
-//   "event BlobBought(address player, uint256 tokenId)",
-//   "function tokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256)",
-//   "function balanceOf(address owner) external view returns (uint256 balance)",
-//   "function buyBlob() external payable" // balanceOf, tokenOfOwnerByIndex
-// ], provider);
-
-// contractWrite = contract.connect(signer);
-
-// contract.on('BlobBought', async (player, tokenId) => {
-//   await nfts.insertOne({
-//     _id: tokenId,
-//     name: "Unnamed",
-//     description: pick_random(DESC_DB),
-//     color: pick_random(COLOR_DB),
-//     size: 7 + Math.floor(Math.random()*9),
-//     dead: false,
-//     image: "https://static.wikia.nocookie.net/meme/images/7/7e/Ytroll-troll-crazy-insane.png" // TODO
-//   });
-// })
-
-// contract.on('Transfer', async (from, to, tokenId) => {
-//   if (to == WALLET_ADDRESS) {
-//     await staked.insertOne({
-//       _id: from,
-//       token: tokenId
-//     });
-//   } else if (from == WALLET_ADDRESS) {
-//     await staked.deleteOne({
-//       _id: to,
-//       token: tokenId
-//     })
-//   } else {
-//     return;
-//   }
-// })
-
-// console.log('The server is working. Ctrl+C to stop.');
+console.log('The server is working. Ctrl+C to stop.');

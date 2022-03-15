@@ -1,7 +1,6 @@
 // import { ethers } from "https://cdn.ethers.io/lib/ethers-5.2.esm.min.js";
 
 var isMetamaskInstalled = () => ethereum.isMetamaskInstalled
-
 if (isMetamaskInstalled) {
     console.log('Metamask is installed!')
 } else {
@@ -12,7 +11,7 @@ if (isMetamaskInstalled) {
 const provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
 console.log(provider)
 let blockNum = await provider.getBlockNumber()
-console.log(blockNum)
+
 // MetaMask requires requesting permission to connect users accounts
 
 // The MetaMask plugin also allows signing transactions to
@@ -80,24 +79,28 @@ socket.on("GameUpdate", (contents) => {
 // Food will be instantiated by the server - an array 
 // will be sent over when the canvas is first drawn - foodEaten events will also be sent
 // by the server when a blob feasts
-function setup() {
-    createCanvas(windowWidth, windowHeight);
-    socket.emit("PlayerJoinRequest", 0 , (id, px, py) => {
-        console.log('PlayerJoinRequest response', id, px, py);
-        playerID = id;
-        ply = player();
-        ply.model.pos.x = px;
-        ply.model.pos.y = py;
-    });
 
-    for (let i = 0; i < 100; i++) {
-        //positions will need to be fed from server
-        let x = random(-width,width)
-        let y = random(-height,height)
-        //this can prolly be kept to show food from server
-        food[i] = new Blob(x, y, 15);
-    }
-}
+const s = ( sketch ) => {
+
+    let x = 300;
+    let y = 300;
+
+    sketch.setup = () => {
+        sketch.createCanvas(1200, 1200);
+        console.log('canvas created')
+        sketch.background(0);
+        console.log('background created')
+    };
+
+    sketch.draw = () => {
+        sketch.background(0);
+        sketch.fill(255);
+        sketch.rect(x,y,50,50);
+    };
+
+};
+
+let inst_p5 = new p5(s);
 
 // Main Game Loop
 function draw() {
@@ -199,6 +202,16 @@ joinBtn.addEventListener('click', function(event) {
     console.log(playerName)
 })
 
+socket.emit("PlayerJoinRequest", 0 , (id, px, py) => {
+    console.log('PlayerJoinRequest response', id, px, py);
+    playerID = id;
+    ply = player();
+    ply.model.pos.x = px;
+    ply.model.pos.y = py;
+});
+
+
+setup();
 
 connectWalletBtn.addEventListener('click', async () => {
     await provider.send("eth_requestAccounts", []);
