@@ -1,5 +1,5 @@
 // import { ethers } from "https://cdn.ethers.io/lib/ethers-5.2.esm.min.js";
-var p5_2 = new p5();
+
 var isMetamaskInstalled = () => ethereum.isMetamaskInstalled
 if (isMetamaskInstalled) {
     console.log('Metamask is installed!')
@@ -75,20 +75,27 @@ socket.on("GameUpdate", (contents) => {
 // will be sent over when the canvas is first drawn - foodEaten events will also be sent
 // by the server when a blob feasts
 
-function setup() {
-    createCanvas(windowWidth, windowHeight);
-    console.log('canvas created')
-    background(0);
-    console.log('background created')
+const s = ( sketch ) => {
 
-    // for (let i = 0; i < 100; i++) {
-    //     //positions will need to be fed from server
-    //     let x = random(-width,width)
-    //     let y = random(-height,height)
-    //     //this can prolly be kept to show food from server
-    //     food[i] = new Blob(x, y, 15);
-    // }
-}
+    let x = 300;
+    let y = 300;
+
+    sketch.setup = () => {
+        sketch.createCanvas(1200, 1200);
+        console.log('canvas created')
+        sketch.background(0);
+        console.log('background created')
+    };
+
+    sketch.draw = () => {
+        sketch.background(0);
+        sketch.fill(255);
+        sketch.rect(x,y,50,50);
+    };
+
+};
+
+let inst_p5 = new p5(s);
 
 // Main Game Loop
 function draw() {

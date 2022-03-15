@@ -182,8 +182,9 @@ function spawnFood(n) {
 }
 spawnFood(100);
 
-// Start the main game loop
 httpServer.listen(3000);
+
+// Start the main game loop
 
 function getPredator(p1, p2) {
   return (p1.size > p2.size && [p1, p2]) || (p2.size > p1.size && [p2, p1]) || [null, null];
