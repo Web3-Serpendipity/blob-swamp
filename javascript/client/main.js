@@ -1,7 +1,6 @@
 // import { ethers } from "https://cdn.ethers.io/lib/ethers-5.2.esm.min.js";
-
+// var p5_2 = new p5();
 var isMetamaskInstalled = () => ethereum.isMetamaskInstalled
-
 if (isMetamaskInstalled) {
     console.log('Metamask is installed!')
 } else {
