@@ -16,14 +16,6 @@ const io = new Server(httpServer, {
   }
 });
 
-io.use(function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', "*");
-  res.header('Access-Control-Allow-Methos', "GET,PUT,POST,DELETE");
-  res.header('Access-Control-Allow-Origin', 'Content-Type');
-})
-
-io.listen(3000);
-
 let players = [];
 let food = [];
 let nfts;
@@ -188,6 +180,7 @@ function spawnFood(n) {
 spawnFood(100);
 
 // Start the main game loop
+httpServer.listen(3000);
 
 function getPredator(p1, p2) {
   return (p1.size > p2.size && [p1, p2]) || (p2.size > p1.size && [p2, p1]) || [null, null];
