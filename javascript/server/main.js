@@ -1,8 +1,11 @@
-const {insert, pick_random} = require("./util.js");
-const {Vector} = require("./vector.js");
+var express = require('express');
+var app = express();
 
-const {RPC_URL, WALLET_SEED, CONTRACT_ADDRESS, WALLET_ADDRESS} = require('./constants.js');
-const {DESC_DB, COLOR_DB} = require('./blob_params_db.js');
+const { insert, pick_random} = require("./util.js");
+const { Vector} = require("./vector.js");
+
+const { RPC_URL, WALLET_SEED, CONTRACT_ADDRESS, WALLET_ADDRESS} = require('./constants.js');
+const { DESC_DB, COLOR_DB} = require('./blob_params_db.js');
 
 const {createServer} = require("http");
 const {Server} = require("socket.io");
@@ -262,11 +265,11 @@ async function mongoSetup() {
   db = mongoClient.db("blobwars");
   nfts = db.collection("nfts");
   staked = db.collection("staked");
+  console.log('mongo connected')
 }
 mongoSetup();
 
-var express = require('express');
-var app = express();
+
 
 // nft api
 

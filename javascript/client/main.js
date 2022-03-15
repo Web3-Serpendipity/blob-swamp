@@ -75,24 +75,7 @@ socket.on("GameUpdate", (contents) => {
 // Food will be instantiated by the server - an array 
 // will be sent over when the canvas is first drawn - foodEaten events will also be sent
 // by the server when a blob feasts
-function setup() {
-    createCanvas(windowWidth, windowHeight);
-    socket.emit("PlayerJoinRequest", 0 , (id, px, py) => {
-        console.log('PlayerJoinRequest response', id, px, py);
-        playerID = id;
-        ply = player();
-        ply.model.pos.x = px;
-        ply.model.pos.y = py;
-    });
 
-    for (let i = 0; i < 100; i++) {
-        //positions will need to be fed from server
-        let x = random(-width,width)
-        let y = random(-height,height)
-        //this can prolly be kept to show food from server
-        food[i] = new Blob(x, y, 15);
-    }
-}
 
 // Main Game Loop
 function draw() {
@@ -194,6 +177,31 @@ joinBtn.addEventListener('click', function(event) {
     console.log(playerName)
 })
 
+socket.emit("PlayerJoinRequest", 0 , (id, px, py) => {
+    console.log('PlayerJoinRequest response', id, px, py);
+    playerID = id;
+    ply = player();
+    ply.model.pos.x = px;
+    ply.model.pos.y = py;
+});
+
+function setup() {
+    createCanvas(600, 600);
+    console.log('canvas created')
+    background(0);
+    console.log('background set')
+    
+
+    for (let i = 0; i < 100; i++) {
+        //positions will need to be fed from server
+        let x = random(-width,width)
+        let y = random(-height,height)
+        //this can prolly be kept to show food from server
+        food[i] = new Blob(x, y, 15);
+    }
+}
+
+setup();
 
 connectWalletBtn.addEventListener('click', async () => {
     await provider.send("eth_requestAccounts", []);
