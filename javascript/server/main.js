@@ -10,19 +10,49 @@ const {Server} = require("socket.io");
 const { ethers } = require("ethers");
 
 const httpServer = createServer();
+console.log(httpServer)
 const io = new Server(httpServer, {
   cors: {
     origin: "*", //"https://localhost:3000"
   }
 });
 
-io.use(function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', "*");
-  res.header('Access-Control-Allow-Methos', "GET,PUT,POST,DELETE");
-  res.header('Access-Control-Allow-Origin', 'Content-Type');
-})
 
-io.listen(3000);
+// io.use(function(req, res, next) {
+//   res.header('Access-Control-Allow-Origin', "*");
+//   res.header('Access-Control-Allow-Methods', "GET,PUT,POST,DELETE");
+//   res.header('Access-Control-Allow-Origin', 'Content-Type');
+// })
+
+
+// Connect to MongoDB
+//
+
+const MongoClient = require("mongodb").MongoClient;
+    
+const url = "mongodb://localhost:27017/";
+const mongoClient = new MongoClient(url);
+let db;
+async function mongoSetup() {
+  await mongoClient.connect();
+  db = mongoClient.db("blobwars");
+  nfts = db.collection("nfts");
+  staked = db.collection("staked");
+}
+mongoSetup();
+
+var express = require('express');
+var app = express();
+
+// nft api
+
+var server = app.listen(8088, function () {
+  var host = server.address().address;
+  console.log(server.address())
+  var port = server.address().port;
+  console.log(port)
+  console.log("nft metadata service blobInfo listening @ http://%s:%s", host, port);
+})
 
 let players = [];
 let food = [];
@@ -173,6 +203,9 @@ io.on("connection", (socket) => {
   console.log('Player has successfully connected.');
 })
 
+httpServer.listen(3001);
+
+
 // Spawn the food
 
 function spawnFood(n) {
@@ -256,26 +289,7 @@ function game_loop() {
 setInterval(game_loop, (1000/tickrate));
 
 //
-// Connect to MongoDB
-//
 
-const MongoClient = require("mongodb").MongoClient;
-    
-const url = "mongodb://localhost:27017/";
-const mongoClient = new MongoClient(url);
-let db;
-async function mongoSetup() {
-  await mongoClient.connect();
-  db = mongoClient.db("blobwars");
-  nfts = db.collection("nfts");
-  staked = db.collection("staked");
-}
-mongoSetup();
-
-var express = require('express');
-var app = express();
-
-// nft api
 
 app.get('/blobInfo/:id', async (req, res) => {
   let qr = await getBlobMetadata(req.params.id);
@@ -283,11 +297,7 @@ app.get('/blobInfo/:id', async (req, res) => {
   res.end(JSON.stringify(qr));
 })
 
-var server = app.listen(8081, function () {
-   var host = server.address().address;
-   var port = server.address().port;
-   console.log("nft metadata service blobInfo listening @ http://%s:%s", host, port);
-})
+
 
 //
 // Connect the wallet
