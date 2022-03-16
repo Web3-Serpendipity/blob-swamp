@@ -1,2 +1,0 @@
-module.exports.DESC_DB = ["What's something you can say both while playing Blob Wars and during sex?", "The coolest blob evah.", "No cap.", "NGMI.", "Probably nothing."];
-module.exports.COLOR_DB = [[70, 70, 70], [56, 100, 59], [66, 95, 100], [12, 86, 100], [100, 59, 91], [90, 41, 98], [97, 100, 22], [99, 54, 9]];

@@ -1,27 +1,3 @@
-// import { ethers } from "https://cdn.ethers.io/lib/ethers-5.2.esm.min.js";
-
-var isMetamaskInstalled = () => ethereum.isMetamaskInstalled
-
-if (isMetamaskInstalled) {
-    console.log('Metamask is installed!')
-} else {
-    alert('Install Metamask extention to connect with DApp!')
-}
-// A Web3Provider wraps a standard Web3 provider, which is
-// what MetaMask injects as window.ethereum into each page
-const provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
-console.log(provider)
-let blockNum = await provider.getBlockNumber()
-console.log(blockNum)
-// MetaMask requires requesting permission to connect users accounts
-
-// The MetaMask plugin also allows signing transactions to
-// send ether and pay to change state within the blockchain.
-// For this, you need the account signer...
-const signer = provider.getSigner()
-console.log(signer)
-
-const connectWalletBtn = document.querySelector('#connect-wlt-btn')
 let blob;
 let food = [];
 let zoom = 1;
@@ -35,7 +11,7 @@ const joinButton = document.querySelector("#joinButton")
 //set parameters for arena
 let playerID;
 let vx,vy;
-const socket = io("http://localhost:3001");
+const socket = io("http://localhost:3000");
 
 let players = [];
 
@@ -75,10 +51,8 @@ socket.on("GameUpdate", (contents) => {
 // Food will be instantiated by the server - an array 
 // will be sent over when the canvas is first drawn - foodEaten events will also be sent
 // by the server when a blob feasts
-// console.log(windowWidth)
 function setup() {
-    createCanvas(1000, 1000);
-    console.log('canvas created')
+    createCanvas(windowWidth, windowHeight);
     socket.emit("PlayerJoinRequest", 0 , (id, px, py) => {
         console.log('PlayerJoinRequest response', id, px, py);
         playerID = id;
@@ -117,6 +91,7 @@ function draw() {
         blob.update();
         blob.constrain();
     }
+
     //iterate through the food array to get the food
     for (let i = food.length-1; i >= 0; i--) {
         food[i].show();
@@ -179,26 +154,13 @@ function randomHex() {
     return Math.floor(Math.random() * 256)
 }
 
-//
+joinButton.addEventListener('click', () => {
+    
+})
 
 document.getElementById('close-modal-btn').addEventListener('click', () => {
     let modal = document.querySelector('#join-game-modal')
     modal.style.display = 'none'
     let header = document.querySelector('.header')
     header.style.display = 'none'
-})
-
-const joinBtn = document.querySelector('#join-btn')
-
-joinBtn.addEventListener('click', function(event) {
-    const playerInput = document.getElementById('blob-name-input')
-    const playerName = playerInput.textContent
-    console.log(playerName)
-})
-
-
-connectWalletBtn.addEventListener('click', async () => {
-    await provider.send("eth_requestAccounts", []);
-    new Toast({message: 'Welcome to Toast.js!'});
-    console.log(signer)
 })

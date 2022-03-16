@@ -11,9 +11,4 @@ function insert(arr, val) {
 	return (arr.length - 1);
 }
 
-function pick_random(items) {
-	return items[Math.floor(Math.random()*items.length)];
-}
-
 exports.insert = insert
-exports.pick_random = pick_random
