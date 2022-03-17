@@ -5,11 +5,9 @@ const {createServer} = require("http");
 const {Server} = require("socket.io");
 
 const httpServer = createServer();
-const io = new Server(httpServer, {
-  cors: {
-    origin: "*", //"https://localhost:3000"
-  }
-});
+
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
 
 var port = process.env.PORT || 5000
 io.listen(port);
