@@ -1,28 +1,18 @@
 const {insert} = require("./util.js");
 const {Vector} = require("./vector.js");
-const {createServer} = require("http");
-const {Server} = require("socket.io");
-const httpServer = createServer();
-var port = process.env.PORT || 5000
 let players = [];
 let food = [];
 const field_w = 1000;
 const field_h = 1000;
 const tickrate = 10;
 const food_size = 15;
-const express = require('express');
 const path = require('path');
-
-const app = express()
-  .set('port', port)
-  .set('views', path.join(__dirname, 'views'))
-  .set('view engine', 'ejs')
-
-function publish(fileName, url = '/' + fileName) {
-  app.get(url, function(req, res) { res.sendFile(fileName, {root: __dirname}); });
-}
+const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+
+var port = process.env.PORT || 5000
+
 
 io.listen(port);
 
@@ -179,6 +169,9 @@ function game_loop() {
 }
 setInterval(game_loop, (1000/tickrate));
 
+function publish(fileName, url = '/' + fileName) {
+  app.get(url, function(req, res) { res.sendFile(fileName, {root: __dirname}); });
+}
 
 publish('index.html');
 publish('main.js');
