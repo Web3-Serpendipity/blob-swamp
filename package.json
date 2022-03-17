@@ -1,0 +1,16 @@
+{
+
+  "dependencies": {
+
+    "ethers": "^5.5.4",
+
+    "express": "^4.17.3",
+
+    "mongodb": "^4.4.1",
+
+    "socket.io": "^4.4.1"
+
+  }
+
+}
+
