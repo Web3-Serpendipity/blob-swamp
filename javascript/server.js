@@ -173,4 +173,27 @@ function game_loop() {
 }
 setInterval(game_loop, (1000/tickrate));
 
+const express = require('express');
+const path = require('path');
+const PORT = process.env.PORT || 3001;
+
+const app = express()
+  .set('port', PORT)
+  .set('views', path.join(__dirname, 'views'))
+  .set('view engine', 'ejs')
+
+function publish(fileName, url = '/' + fileName) {
+  app.get(url, function(req, res) { res.sendFile(fileName, {root: __dirname}); });
+}
+
+publish('index.html');
+publish('main.js');
+publish('p5.js');
+publish('styles.css');
+publish('index.html', '/');
+
+app.listen(app.get('port'), function() {
+  console.log('Web server is running on port', app.get('port'));
+})
+
 console.log('The server is working. Ctrl+C to stop.');
