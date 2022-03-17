@@ -11,7 +11,8 @@ const io = new Server(httpServer, {
   }
 });
 
-io.listen(3000);
+var port = process.env.PORT || 5000
+io.listen(port);
 
 let players = [];
 let food = [];
@@ -175,10 +176,9 @@ setInterval(game_loop, (1000/tickrate));
 
 const express = require('express');
 const path = require('path');
-const PORT = process.env.PORT || 3001;
 
 const app = express()
-  .set('port', PORT)
+  .set('port', port)
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
 
