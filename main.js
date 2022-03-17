@@ -11,7 +11,7 @@ const joinButton = document.querySelector("#joinButton")
 //set parameters for arena
 let playerID;
 let vx,vy;
-const socket = io("https://blob-war.herokuapp.com");
+const socket = io("https://blob-war.herokuapp.com:3000");
 
 let players = [];
 
