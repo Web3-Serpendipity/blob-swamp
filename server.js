@@ -13,8 +13,12 @@ const io = require('socket.io')(http);
 
 var port = process.env.PORT || 5000
 
+//app.set('port', port);
+//io.listen(port);
 
-io.listen(port);
+http.listen(port, function() {
+   console.log(`listening on *:${port}`);
+});
 
 io.on("connection", (socket) => {
   let playerId = null;
@@ -51,7 +55,7 @@ io.on("connection", (socket) => {
     }
     console.log(`Player ${playerId} has joined the game.`);
   });
-    
+
   socket.on('disconnect', () => {
     delete players[playerId];
     io.emit("PlayerLeft", playerId);
