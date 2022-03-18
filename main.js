@@ -32,18 +32,14 @@ socket.on("GameUpdate", (contents) => {
     if (players[playerID] == undefined) {return};
 
     contents.forEach(x => {
-
         ply = players[x[0]];
         if (ply == undefined) {return};
-
         ply.model.r = x[5];
         if (x[0] == playerID) {return};
-
         ply.model.pos = createVector(x[1], x[2]);
         ply.model.velocity = createVector(x[3], x[4]);
     });
 
-    //console.log('PlayerUpdate', player().model.pos.x, player().model.pos.y, player().model.velocity.x, player().model.velocity.y);
     socket.emit("PlayerUpdate", player().model.pos.x, player().model.pos.y, player().model.velocity.x, player().model.velocity.y);
 });
 
@@ -62,10 +58,10 @@ function setup() {
     });
 
     for (let i = 0; i < 100; i++) {
-        //positions will need to be fed from server
+        //positions will need to be fed from server eventually
         let x = random(-width,width)
         let y = random(-height,height)
-        //this can prolly be kept to show food from server
+        //Create a blob object representing food for 100 random locations
         food[i] = new Blob(x, y, 15);
     }
 }
