@@ -45,10 +45,11 @@ io.on("connection", (socket) => {
   socket.on("PlayerJoinRequest", (tokenId, callback) => {
     if (isInGame()) {return;}
 
-    player().state = PLAYER_INGAME;
-    player().pos = new Vector(Math.floor(Math.random()*field_w), Math.floor(Math.random()*field_h));
-    player().velocity = new Vector(0, 0);
-    player().size = 64;
+    let playerData = player();
+    playerData.state = PLAYER_INGAME;
+    playerData.pos = new Vector(Math.floor(Math.random()*field_w), Math.floor(Math.random()*field_h));
+    playerData.velocity = new Vector(0, 0);
+    playerData.size = 64;
 
     console.log('PlayerJoinRequest', playerId, playerData);
 
@@ -76,6 +77,7 @@ io.on("connection", (socket) => {
   socket.on("PlayerLeaveRequest", () => {
     if (!isInGame()) {return;}
     player().state = PLAYER_CONNECTED;
+    io.emit("PlayerLeft", playerId);
     console.log(`Player ${playerId} left the game.`);
   })
 
@@ -133,7 +135,7 @@ function game_loop() {
 
     for (j = 0; j < players.length; j++) {
       let ply = players[j]
-      if (ply.pos.distancesqr(food[i]) < (ply.size + 15)**2) {
+      if (ply.state == PLAYER_INGAME && ply.pos.distancesqr(food[i]) < (ply.size + 15)**2) {
         food.splice(i, 1);
 
         let sum = Math.PI * ply.size * ply.size + Math.PI * 15 * 15;
@@ -176,7 +178,7 @@ function game_loop() {
   let contents = [];
   for (i = 0; i < players.length; i++) {
     let data = players[i];
-    if (data != undefined) {
+    if (data != undefined && data.state == PLAYER_INGAME) {
       contents.push([data.id, data.pos.x, data.pos.y, data.velocity.x, data.velocity.y, data.size]);
     }
   }
