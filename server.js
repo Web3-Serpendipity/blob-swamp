@@ -16,29 +16,40 @@ var port = process.env.PORT || 3000
 //app.set('port', port);
 //io.listen(port);
 
-http.listen(port, function() {
-   console.log(`listening on *:${port}`);
-});
+const PLAYER_CONNECTED = 0;
+const PLAYER_INGAME = 1;
 
 io.on("connection", (socket) => {
-  let playerId = null;
+  let playerId;
+
+  function playerInit() {
+    let playerData = {
+      state: PLAYER_CONNECTED,
+      pos: new Vector(0, 0),
+      velocity: new Vector(0, 0),
+      size: 0,
+      blob: {}
+    };
+    playerData.id = insert(players, playerData);
+    playerId = playerData.id;
+  }
 
   function player() {
     return players[playerId];
   }
 
-  console.log('A user just connected.');
+  function isInGame() {
+    return player().state == PLAYER_INGAME;
+  }
 
   socket.on("PlayerJoinRequest", (tokenId, callback) => {
-    let playerData = {
-      pos: new Vector(Math.floor(Math.random()*field_w), Math.floor(Math.random()*field_h)),
-      velocity: new Vector(0, 0),
-      size: 64, // TODO
-      //socket: socket;
-      blob: {}
-    };
-    playerData.id = insert(players, playerData);
-    playerId = playerData.id;
+    if (isInGame()) {return;}
+
+    let playerData = player();
+    playerData.state = PLAYER_INGAME;
+    playerData.pos = new Vector(Math.floor(Math.random()*field_w), Math.floor(Math.random()*field_h));
+    playerData.velocity = new Vector(0, 0);
+    playerData.size = 64;
 
     console.log('PlayerJoinRequest', playerId, playerData);
 
@@ -59,18 +70,20 @@ io.on("connection", (socket) => {
   socket.on('disconnect', () => {
     delete players[playerId];
     io.emit("PlayerLeft", playerId);
-    console.log(`Player ${playerId} left the game (disconnect).`);
+    console.log(`Player ${playerId} has disconnected (socket closing).`);
     playerId = null;
   })
 
   socket.on("PlayerLeaveRequest", () => {
-    delete players[playerId];
+    if (!isInGame()) {return;}
+    player().state = PLAYER_CONNECTED;
     io.emit("PlayerLeft", playerId);
     console.log(`Player ${playerId} left the game.`);
-    playerId = null;
   })
 
   socket.on('PlayerUpdate', (px, py, vx, vy) => {
+    if (!isInGame()) {return;}
+
     let newpos = new Vector(px, py);
     let newvel = new Vector(vx, vy);
 
@@ -89,7 +102,8 @@ io.on("connection", (socket) => {
     player().velocity = newvel;
   })
 
-  console.log('Player has successfully connected.');
+  playerInit();
+  console.log(`Player ${playerId} has successfully connected.`);
 })
 
 // Spawn the food
@@ -121,7 +135,7 @@ function game_loop() {
 
     for (j = 0; j < players.length; j++) {
       let ply = players[j]
-      if (ply.pos.distancesqr(food[i]) < (ply.size + 15)**2) {
+      if (ply.state == PLAYER_INGAME && ply.pos.distancesqr(food[i]) < (ply.size + 15)**2) {
         food.splice(i, 1);
 
         let sum = Math.PI * ply.size * ply.size + Math.PI * 15 * 15;
@@ -164,7 +178,7 @@ function game_loop() {
   let contents = [];
   for (i = 0; i < players.length; i++) {
     let data = players[i];
-    if (data != undefined) {
+    if (data != undefined && data.state == PLAYER_INGAME) {
       contents.push([data.id, data.pos.x, data.pos.y, data.velocity.x, data.velocity.y, data.size]);
     }
   }
@@ -183,8 +197,8 @@ publish('p5.js');
 publish('styles.css');
 publish('index.html', '/');
 
-app.listen(app.get('port'), function() {
-  console.log('Web server is running on port', app.get('port'));
-})
+http.listen(port, function() {
+   console.log(`listening on *:${port}`);
+});
 
 console.log('The server is working. Ctrl+C to stop.');
