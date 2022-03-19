@@ -27,6 +27,11 @@ socket.on('PlayerJoined', (pid, blob) => {
     };
 })
 
+socket.on('PlayerLeft', (pid) => {
+    if (pid == playerID) {return;} // TODO: handle this.
+    delete players[pid];
+})
+
 socket.on("GameUpdate", (contents) => {
     if (playerID == undefined) {return};
     if (players[playerID] == undefined) {return};
