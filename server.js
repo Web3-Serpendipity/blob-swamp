@@ -196,6 +196,8 @@ publish('main.js');
 publish('p5.js');
 publish('styles.css');
 publish('index.html', '/');
+publish('images/metamask.svg');
+publish('images/title_blob.png');
 
 http.listen(port, function() {
    console.log(`listening on *:${port}`);
