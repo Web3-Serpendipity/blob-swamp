@@ -90,6 +90,11 @@ function draw() {
     translate(-localModel.pos.x, -localModel.pos.y)
     localModel.control();
 
+    //iterate through the food array to get the food
+    for (let i = food.length-1; i >= 0; i--) {
+        food[i].show();
+    }
+
     for (let i = 0; i < players.length; i++) {
         if (players[i] == undefined) {continue};
         let blob = players[i].model;
@@ -98,10 +103,6 @@ function draw() {
         blob.constrain();
     }
 
-    //iterate through the food array to get the food
-    for (let i = food.length-1; i >= 0; i--) {
-        food[i].show();
-    }
     // Check to see if blobs are eating each other
     /*for (let i = activePlayers.length-1; i >= 0; i--) {
         if (blob.eats(activePlayers[i])) {
