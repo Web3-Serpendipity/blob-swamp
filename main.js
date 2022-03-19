@@ -68,10 +68,12 @@ function setup() {
 
 socket.on('FoodCreated', (id, x, y) => {
     food[id] = new Blob(x, y, 15);
+    food[id].id = id;
 })
 
 socket.on('FoodEaten', (id) => {
     food.splice(id, 1);
+    console.log(`food ${id} eaten`);
 })
 
 // Main Game Loop

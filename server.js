@@ -136,6 +136,7 @@ function game_loop() {
     for (j = 0; j < players.length; j++) {
       let ply = players[j]
       if (ply != undefined && ply.state == PLAYER_INGAME && ply.pos.distancesqr(food[i]) < (ply.size + 15)**2) {
+        console.log(`food ${i} eaten by player ${j}`);
         food.splice(i, 1);
 
         let sum = Math.PI * ply.size * ply.size + Math.PI * 15 * 15;
