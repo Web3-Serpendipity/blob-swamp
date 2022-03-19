@@ -110,12 +110,12 @@ io.on("connection", (socket) => {
 
 function spawnFood(n) {
   for (let i = 0; i < n; i++) {
-    //positions will need to be fed from server
     let x = -field_w + Math.random()*field_w*2;
     let y = -field_h + Math.random()*field_h*2;
-    //this can prolly be kept to show food from server
-    food[i] = new Vector(x, y); // radius=15
-    io.emit('FoodCreated', i, food[i].x, food[i].y);
+
+    let id = food.length;
+    food.push(new Vector(x, y));
+    io.emit('FoodCreated', id, food[id].x, food[id].y);
   }
 }
 spawnFood(100);
