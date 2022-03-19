@@ -1,36 +1,101 @@
 * {
     margin: 0;
     padding: 0;
+    font-family: Trebuchet MS,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Tahoma,sans-serif;
 }
-#arena {
-    height: 100vh;
+
+img {
     width: 100%;
-    background: blue;
+    display: block;
 }
 
 .header {
-    margin: .5em auto;
+    /* margin: .5em auto; */
+    /* margin-top: -.75em; */
     text-align: center;
-    font-size: 5rem;
-    font-family: 'Monoton', cursive;
-    color: green;
+    text-transform: uppercase;
+    font-size: 3rem;
+    /* font-family: 'Monoton', cursive; */
+    color: red;
+}
+
+.japanese-header {
+    width: 1em;
+    margin: 1em auto;
+    color: #2753A8;
+    font-weight: 600;
+    font-size: 1.75em;
+    font-family : 'ヒラギノ角ゴ ProN' , 'Hiragino Kaku Gothic ProN' , '游ゴシック' , '游ゴシック体' , YuGothic , 'Yu Gothic' , 'メイリオ' , Meiryo , 'ＭＳ ゴシック' , 'MS Gothic' , HiraKakuProN-W3 , 'TakaoExゴシック' , TakaoExGothic , 'MotoyaLCedar' , 'Droid Sans Japanese' , sans-serif;
+}
+
+.join-game-modal {
+    /* display: flex; */
+    /* justify-content: center; */
+    /* text-align: center; */
+}
+
+.blob {
+    width: 200px;
+    margin: 2rem auto 0;
+}
+
+.info-fields {
+    /* text-align: center; */
+    backdrop-filter: blur(20px);
+    margin-top: -59px;
+    padding-top: 50px;
+}
+
+.btn {
+    padding: 0.2em 2em;
+    border: none;
+    border-radius: 2.5em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1.2em auto;
+    font-weight: 500;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    background: rgb(255, 255, 255);
+    box-shadow: 0 0 10px 0px rgb(150, 150, 150);
+}
+
+.btn:hover,
+.btn:focus {
+    background: linear-gradient(65deg, red, orange);
+    cursor: pointer;
+    color: #fff;
 }
 
 #join-game-modal {
     position: absolute;
+    width: 300px;
     padding: 1em;
-    top: 30%;
+    /* top: 0%; */
     left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: pink;
+    /* bottom: 10%; */
+    transform: translateX(-50%);
+    margin: 20px auto;
+    background-color: rgb(240, 240, 240);
+    /* box-shadow: 0 0 1em 1em rgba(252, 252, 252, 0.2); */
+}
+
+#close-modal-btn {
+    background-color: rgba(255, 255, 255, 0.322);
+    border-radius: 20px;
+    padding: .4rem .6rem;
+    /* top: 2%; */
+    /* right: 1%; */
+    /* position: absolute; */
+}
+
+#metamask {
+    width: 8rem;
+    display: inline-block;
 }
 
 .modal-title {
     display: flex;
-    justify-content: space-between;
-}
-
-.p5canvas {
-    height: 100vh;
-    width: 100%;
+    justify-content: flex-end;
 }

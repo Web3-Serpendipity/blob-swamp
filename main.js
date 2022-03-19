@@ -154,9 +154,9 @@ function randomHex() {
     return Math.floor(Math.random() * 256)
 }
 
-joinButton.addEventListener('click', () => {
+// joinButton.addEventListener('click', () => {
     
-})
+// })
 
 document.getElementById('close-modal-btn').addEventListener('click', () => {
     let modal = document.querySelector('#join-game-modal')
