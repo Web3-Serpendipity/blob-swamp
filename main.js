@@ -57,14 +57,18 @@ function setup() {
         ply.model.pos.y = py;
     });
 
-    for (let i = 0; i < 100; i++) {
+    /*for (let i = 0; i < 100; i++) {
         //positions will need to be fed from server eventually
         let x = random(-width,width)
         let y = random(-height,height)
         //Create a blob object representing food for 100 random locations
         food[i] = new Blob(x, y, 15);
-    }
+    }*/
 }
+
+socket.on('FoodCreated', (id, x, y) => {
+    food[id] = new Blob(x, y, 15);
+})
 
 // Main Game Loop
 function draw() {
