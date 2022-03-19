@@ -27,6 +27,11 @@ socket.on('PlayerJoined', (pid, blob) => {
     };
 })
 
+socket.on('PlayerLeft', (pid) => {
+    if (pid == playerID) {return;} // TODO: handle this.
+    delete players[pid];
+})
+
 socket.on("GameUpdate", (contents) => {
     if (playerID == undefined) {return};
     if (players[playerID] == undefined) {return};
@@ -57,14 +62,24 @@ function setup() {
         ply.model.pos.y = py;
     });
 
-    for (let i = 0; i < 100; i++) {
+    /*for (let i = 0; i < 100; i++) {
         //positions will need to be fed from server eventually
         let x = random(-width,width)
         let y = random(-height,height)
         //Create a blob object representing food for 100 random locations
         food[i] = new Blob(x, y, 15);
-    }
+    }*/
 }
+
+socket.on('FoodCreated', (id, x, y) => {
+    food[id] = new Blob(x, y, 15);
+    food[id].id = id;
+})
+
+socket.on('FoodEaten', (id) => {
+    food.splice(id, 1);
+    console.log(`food ${id} eaten`);
+})
 
 // Main Game Loop
 function draw() {
@@ -80,6 +95,11 @@ function draw() {
     translate(-localModel.pos.x, -localModel.pos.y)
     localModel.control();
 
+    //iterate through the food array to get the food
+    for (let i = food.length-1; i >= 0; i--) {
+        food[i].show();
+    }
+
     for (let i = 0; i < players.length; i++) {
         if (players[i] == undefined) {continue};
         let blob = players[i].model;
@@ -88,17 +108,6 @@ function draw() {
         blob.constrain();
     }
 
-    //iterate through the food array to get the food
-    for (let i = food.length-1; i >= 0; i--) {
-        food[i].show();
-        if (localModel.eats(food[i])) {
-            //pushes food eaten to array that can be sent to server
-            foodEaten.push(i)
-            // console.log(foodEaten)
-            food.splice(i, 1)
-
-        }
-    }
     // Check to see if blobs are eating each other
     /*for (let i = activePlayers.length-1; i >= 0; i--) {
         if (blob.eats(activePlayers[i])) {

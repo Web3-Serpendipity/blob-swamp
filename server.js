@@ -110,20 +110,21 @@ io.on("connection", (socket) => {
 
 function spawnFood(n) {
   for (let i = 0; i < n; i++) {
-    //positions will need to be fed from server
     let x = -field_w + Math.random()*field_w*2;
     let y = -field_h + Math.random()*field_h*2;
-    //this can prolly be kept to show food from server
-    food[i] = new Vector(x, y); // radius=15
-    io.emit('FoodCreated', i, food[i].x, food[i].y);
+
+    let id = food.length;
+    food.push(new Vector(x, y));
+    io.emit('FoodCreated', id, food[id].x, food[id].y);
   }
 }
 spawnFood(100);
 
 // Start the main game loop
 
-function getPredator(p1, p2) {
-  return (p1.size > p2.size && p1) || (p2.size > p1.size && p2) || null;
+function getBlobRelationship(p1, p2) {
+  diff = p1.size - p2.size;
+  return (diff > 10 && [p1, p2]) || (diff < -10 && [p2, p1]) || [null, null];
 }
 
 function game_loop() {
@@ -136,6 +137,7 @@ function game_loop() {
     for (j = 0; j < players.length; j++) {
       let ply = players[j]
       if (ply != undefined && ply.state == PLAYER_INGAME && ply.pos.distancesqr(food[i]) < (ply.size + 15)**2) {
+        console.log(`food ${i} eaten by player ${j}`);
         food.splice(i, 1);
 
         let sum = Math.PI * ply.size * ply.size + Math.PI * 15 * 15;
@@ -151,28 +153,28 @@ function game_loop() {
   // Respawn eaten food
   spawnFood(removed_food);
 
-  // TODO: Check eating of other blobs
-  /*dead_players = [];
+  // Check eating of other blobs
   for (i = 0; i < players.length; i++) {
     let ply1 = players[i];
-    if (ply1 == undefined) {continue};
+    if (ply1 == undefined || ply1.state != PLAYER_INGAME) {continue;}
 
     for (j = 0; j < players.length; j++) {
       let ply2 = players[j]
+      if (i == j || ply2 == undefined || ply2.state != PLAYER_INGAME) {continue;}
+
       if (ply1.pos.distancesqr(ply2.pos) < (ply1.size + ply2.size)**2) {
-        let predator = getPredator(ply1, ply2);
-        if (predator == null) {continue};
+        let [att, vict] = getBlobRelationship(ply1, ply2);
+        if (att == null) {console.log(`Size diff too smol for players ${ply1.id} and ${ply2.id}`); continue;}
 
-        let sum = Math.PI * ply.size * ply.size + Math.PI * 15 * 15;
-        ply.size = sqrt(sum / Math.PI);
+        let sum = Math.PI * att.size * att.size + Math.PI * vict.size * vict.size;
+        att.size = Math.sqrt(sum / Math.PI);
 
-        dead_players.push()
-        io.emit('FoodEaten', i);
-        i--;
-        removed_food += 1;
+        vict.state = PLAYER_CONNECTED;
+        io.emit('PlayerLeft', vict.id);
+        console.log(`Player ${vict.id} eaten by ${att.id}`);
       }
     }
-  }*/
+  }
 
   // broadcast the game update to all clients
   let contents = [];
