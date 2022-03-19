@@ -70,6 +70,10 @@ socket.on('FoodCreated', (id, x, y) => {
     food[id] = new Blob(x, y, 15);
 })
 
+socket.on('FoodEaten', (id) => {
+    food.splice(id, 1);
+})
+
 // Main Game Loop
 function draw() {
     background(0);
@@ -95,13 +99,6 @@ function draw() {
     //iterate through the food array to get the food
     for (let i = food.length-1; i >= 0; i--) {
         food[i].show();
-        if (localModel.eats(food[i])) {
-            //pushes food eaten to array that can be sent to server
-            foodEaten.push(i)
-            // console.log(foodEaten)
-            food.splice(i, 1)
-
-        }
     }
     // Check to see if blobs are eating each other
     /*for (let i = activePlayers.length-1; i >= 0; i--) {
