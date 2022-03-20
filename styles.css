@@ -4,6 +4,10 @@
     font-family: Trebuchet MS,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Tahoma,sans-serif;
 }
 
+body {
+    background-color: #000;
+}
+
 img {
     width: 100%;
     display: block;
