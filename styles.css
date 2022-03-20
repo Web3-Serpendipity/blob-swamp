@@ -14,12 +14,9 @@ img {
 }
 
 .header {
-    /* margin: .5em auto; */
-    /* margin-top: -.75em; */
     text-align: center;
     text-transform: uppercase;
     font-size: 3rem;
-    /* font-family: 'Monoton', cursive; */
     color: red;
 }
 
@@ -44,7 +41,6 @@ img {
 }
 
 .info-fields {
-    /* text-align: center; */
     backdrop-filter: blur(20px);
     margin-top: -59px;
     padding-top: 50px;
@@ -85,21 +81,7 @@ img {
     /* box-shadow: 0 0 1em 1em rgba(252, 252, 252, 0.2); */
 }
 
-#close-modal-btn {
-    background-color: rgba(255, 255, 255, 0.322);
-    border-radius: 20px;
-    padding: .4rem .6rem;
-    /* top: 2%; */
-    /* right: 1%; */
-    /* position: absolute; */
-}
-
 #metamask {
     width: 8rem;
     display: inline-block;
-}
-
-.modal-title {
-    display: flex;
-    justify-content: flex-end;
 }
