@@ -50,7 +50,7 @@ img {
     padding: 0.2em 2em;
     border: none;
     border-radius: 2.5em;
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
     margin: 1.2em auto;

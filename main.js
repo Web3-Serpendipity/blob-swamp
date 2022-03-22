@@ -16,6 +16,41 @@ let startGame = false;
 
 let players = [];
 
+const isMetaMaskInstalled = () => ethereum.isMetaMaskInstalled
+const connectBtn = document.getElementById('connect-btn')
+const dlBtn = document.getElementById('dl-btn')
+
+
+if (typeof window.ethereum !== 'undefined') {
+    console.log('MetaMask is installed!');
+    connectBtn.style.display = 'flex'
+    dlBtn.style.display = 'none'
+} else {
+    connectBtn.style.display = 'none'
+    dlBtn.style.display = 'flex'
+}
+
+const showAccount = document.querySelector('#show-account')
+
+connectBtn.addEventListener('click', getAccount);
+
+async function getAccount() {
+  const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+  const account = accounts[0];
+  showAccount.innerHTML = account;
+  if (account !== undefined) {
+      connectBtn.style.display = 'none'
+      joinButton.style.display = 'flex'
+  }
+}
+
+
+
+
+
+
+
+
 function player() {
     return players[playerID];
 }

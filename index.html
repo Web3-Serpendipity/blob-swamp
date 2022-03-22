@@ -9,6 +9,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Monoton&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="styles.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
         <script async src="p5.js"></script>
         <script async src="main.js"></script>
         <script type="module">
@@ -22,10 +23,11 @@
             <h3 class="japanese-header">ブロブ戦争</h3>
             <img class="blob" src="./images/title_blob.png" alt="hungry blob">
             <div class="info-fields">
-                <button class="btn" aria-label="connect wallet button">Connect <img id="metamask" src="./images/metamask.svg" alt="metamask logo"></button>
-                <button class="btn" aria-label="link to MetaMask site" onclick="javascript:window.open('https://metamask.io/', '_blank');" value="Go to MetaMask">Get <img id="metamask" src="./images/metamask.svg" alt="metamask logo"></button>
+                <button id="connect-btn" class="btn" aria-label="connect wallet button">Connect <img id="metamask" src="./images/metamask.svg" alt="metamask logo"></button>
+                <button id="dl-btn" class="btn" aria-label="link to MetaMask site" onclick="javascript:window.open('https://metamask.io/', '_blank');" value="Go to MetaMask">Get <img id="metamask" src="./images/metamask.svg" alt="metamask logo"></button>
                 <br>
                 <button id="joinButton" name="joinButton" class="btn active">Join Game</button>
+                <p id="show-account"></p>
             </div>
         </div>
     </body>
