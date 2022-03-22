@@ -12,6 +12,7 @@ const joinButton = document.querySelector("#joinButton")
 let playerID;
 let vx,vy;
 const socket = io(window.location.href);
+let startGame = false;
 
 let players = [];
 
@@ -52,8 +53,7 @@ socket.on("GameUpdate", (contents) => {
 // Food will be instantiated by the server - an array 
 // will be sent over when the canvas is first drawn - foodEaten events will also be sent
 // by the server when a blob feasts
-function setup() {
-    createCanvas(windowWidth, windowHeight);
+const playerJoinEvent = () => {
     socket.emit("PlayerJoinRequest", 0 , (id, px, py) => {
         console.log('PlayerJoinRequest response', id, px, py);
         playerID = id;
@@ -61,6 +61,10 @@ function setup() {
         ply.model.pos.x = px;
         ply.model.pos.y = py;
     });
+}
+    
+function setup() {
+    createCanvas(windowWidth, windowHeight);
 
     /*for (let i = 0; i < 100; i++) {
         //positions will need to be fed from server eventually
@@ -85,35 +89,37 @@ socket.on('FoodEaten', (id) => {
 function draw() {
     background(0);
 
-    if (player() == undefined) {return};
-    let localModel = player().model;
+    if (startGame) {
+        if (player() == undefined) {return};
+        let localModel = player().model;
 
-    translate(width/2, height/2)
-    let newZoom = 64 / localModel.r;
-    zoom = lerp(zoom, newZoom, .1)
-    scale(zoom)
-    translate(-localModel.pos.x, -localModel.pos.y)
-    localModel.control();
+        translate(width/2, height/2)
+        let newZoom = 64 / localModel.r;
+        zoom = lerp(zoom, newZoom, .1)
+        scale(zoom)
+        translate(-localModel.pos.x, -localModel.pos.y)
+        localModel.control();
 
-    //iterate through the food array to get the food
-    for (let i = food.length-1; i >= 0; i--) {
-        food[i].show();
-    }
-
-    for (let i = 0; i < players.length; i++) {
-        if (players[i] == undefined) {continue};
-        let blob = players[i].model;
-        blob.show();
-        blob.update();
-        blob.constrain();
-    }
-
-    // Check to see if blobs are eating each other
-    /*for (let i = activePlayers.length-1; i >= 0; i--) {
-        if (blob.eats(activePlayers[i])) {
-            activePlayers.splice(i, 1)
+        //iterate through the food array to get the food
+        for (let i = food.length-1; i >= 0; i--) {
+            food[i].show();
         }
-    }*/
+
+        for (let i = 0; i < players.length; i++) {
+            if (players[i] == undefined) {continue};
+                let blob = players[i].model;
+                blob.show();
+                blob.update();
+                blob.constrain();
+        }
+
+        // Check to see if blobs are eating each other
+        /*for (let i = activePlayers.length-1; i >= 0; i--) {
+            if (blob.eats(activePlayers[i])) {
+                activePlayers.splice(i, 1)
+            }
+        }*/
+    }
 }
 
 function Blob(x, y, r) {
@@ -160,12 +166,8 @@ function randomHex() {
 }
 
 joinButton.addEventListener('click', () => {
-    
-})
-
-document.getElementById('close-modal-btn').addEventListener('click', () => {
-    let modal = document.querySelector('#join-game-modal')
+    const modal = document.querySelector('#join-game-modal')
     modal.style.display = 'none'
-    let header = document.querySelector('.header')
-    header.style.display = 'none'
+    playerJoinEvent()
+    startGame = true;
 })

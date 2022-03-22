@@ -14,20 +14,18 @@
         <script type="module">
             import { io } from "https://cdn.socket.io/4.3.2/socket.io.esm.min.js";
           </script>
-        <title>Blob Swamp</title>
+        <title>Blob Wars</title>
     </head>
     <body>
-        <h1 class="header">Blob Wars!</h1>
         <div id="join-game-modal" class=" active">
-            <div class="modal-title">
-                    <h2>Hello!</h2>
-                    <button id="close-modal-btn">X</button>
-            </div>
+            <h1 class="header">Blob War</h1>
+            <h3 class="japanese-header">ブロブ戦争</h3>
+            <img class="blob" src="./images/title_blob.png" alt="hungry blob">
             <div class="info-fields">
-                <h2>Welcome to Blob Wars</h2>
-                <p>Please connect your wallet to begin.</p>
-                <button>Connect Wallet</button>
-                <button id="joinButton" name="joinButton" class="active">Join Game</button>
+                <button class="btn" aria-label="connect wallet button">Connect <img id="metamask" src="./images/metamask.svg" alt="metamask logo"></button>
+                <button class="btn" aria-label="link to MetaMask site" onclick="javascript:window.open('https://metamask.io/', '_blank');" value="Go to MetaMask">Get <img id="metamask" src="./images/metamask.svg" alt="metamask logo"></button>
+                <br>
+                <button id="joinButton" name="joinButton" class="btn active">Join Game</button>
             </div>
         </div>
     </body>
