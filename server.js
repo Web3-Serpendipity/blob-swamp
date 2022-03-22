@@ -155,8 +155,7 @@ function game_loop() {
         console.log(`food ${i} eaten by player ${j}`);
         food.splice(i, 1);
 
-        let sum = Math.PI * ply.size * ply.size + Math.PI * 15 * 15;
-        ply.size = Math.sqrt(sum / Math.PI);
+        ply.size = Math.sqrt(ply.size**2 + (Math.exp(-ply.size/64 + 1)) * 225)
 
         io.emit('FoodEaten', i);
         i--;
@@ -168,6 +167,23 @@ function game_loop() {
   // Respawn eaten food
   spawnFood(removed_food);
 
+  // Takes in two game objects, determines aggressor and updates size of victor
+  function checkConsumption(p1, p2)
+  {
+    //determine which is the aggressor (larger)
+    let [att, vict] = getBlobRelationship(p1, p2);
+    // ignore combat if player are roughly equal size
+    if (att == null) {console.log(`Size diff too smol for players ${ply1.id} and ${ply2.id}`);}
+
+    // update attackers size directly
+    att.size = Math.sqrt(att.size**2 + (Math.exp(-att.size/64 + 1)) * vict.size**2)
+    //kick out the victim if killed
+    vict.state = PLAYER_CONNECTED;
+    io.emit('PlayerLeft', vict.id);
+    console.log(`Player ${vict.id} eaten by ${att.id}`);
+  }
+
+
   // Check eating of other blobs
   for (i = 0; i < players.length; i++) {
     let ply1 = players[i];
@@ -177,16 +193,9 @@ function game_loop() {
       let ply2 = players[j]
       if (i == j || ply2 == undefined || ply2.state != PLAYER_INGAME) {continue;}
 
+      // if players are close enough together, see which player gets eaten
       if (ply1.pos.distancesqr(ply2.pos) < (ply1.size + ply2.size)**2) {
-        let [att, vict] = getBlobRelationship(ply1, ply2);
-        if (att == null) {console.log(`Size diff too smol for players ${ply1.id} and ${ply2.id}`); continue;}
-
-        let sum = Math.PI * att.size * att.size + Math.PI * vict.size * vict.size;
-        att.size = Math.sqrt(sum / Math.PI);
-
-        vict.state = PLAYER_AUTHED;
-        io.emit('PlayerLeft', vict.id);
-        console.log(`Player ${vict.id} eaten by ${att.id}`);
+        checkConsumption(ply1, ply2)
       }
     }
   }

@@ -194,7 +194,7 @@ function Blob(x, y, r) {
         let d = p5.Vector.dist(this.pos, foodItem.pos)
         if (d < this.r + foodItem.r) {
             let sum = PI * this.r * this.r + PI * foodItem.r * foodItem.r
-            this.r = sqrt(sum / PI)
+            this.r = sqrt(this.r ** 2 + Math.exp(-this.r + 64) * foodItem.r**2)
             return true
         }
         return false;
