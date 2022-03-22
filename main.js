@@ -19,6 +19,8 @@ let players = [];
 const isMetaMaskInstalled = () => ethereum.isMetaMaskInstalled
 const connectBtn = document.getElementById('connect-btn')
 const dlBtn = document.getElementById('dl-btn')
+let signerNonce;
+let isAuthenticated = false;
 
 
 if (typeof window.ethereum !== 'undefined') {
@@ -30,20 +32,32 @@ if (typeof window.ethereum !== 'undefined') {
     dlBtn.style.display = 'flex'
 }
 
+socket.on('AuthNonce', (nonce) => {
+    signerNonce = nonce
+})
 const showAccount = document.querySelector('#show-account')
 
 connectBtn.addEventListener('click', getAccount);
 
 async function getAccount() {
-  const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-  const account = accounts[0];
-  showAccount.innerHTML = account;
-  if (account !== undefined) {
-      connectBtn.style.display = 'none'
-      joinButton.style.display = 'flex'
-  }
+    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    // Prompt user for account connections
+    await provider.send("eth_requestAccounts", []);
+    const signer = provider.getSigner();
+    const signature = await signer.signMessage(signerNonce.toString());
+    console.log("Account:", await signer.getAddress());
+    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+    const account = accounts[0];
+    showAccount.innerHTML = account;
+    if (account !== undefined) {
+        connectBtn.style.display = 'none'
+        joinButton.style.display = 'flex'
+        playerAddress = account
+        socket.emit('PlayerAuth', playerAddress, signature, () => {
+            isAuthenticated = true;
+        })
+    }
 }
-
 
 
 
@@ -128,7 +142,7 @@ socket.on('FoodEaten', (id) => {
 function draw() {
     background(0);
 
-    if (startGame) {
+    if (startGame && isAuthenticated) {
         if (player() == undefined) {return};
         let localModel = player().model;
 
