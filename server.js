@@ -173,7 +173,7 @@ function game_loop() {
     //determine which is the aggressor (larger)
     let [att, vict] = getBlobRelationship(p1, p2);
     // ignore combat if player are roughly equal size
-    if (att == null) {console.log(`Size diff too smol for players ${p1.id} and ${p2.id}`);}
+    if (att == null) {console.log(`Size diff too smol for players ${p1.id} and ${p2.id}`); return;}
 
     // update attackers size directly
     att.size = Math.sqrt(att.size**2 + (Math.exp(-att.size/64 + 1)) * vict.size**2)
