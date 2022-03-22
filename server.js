@@ -140,8 +140,7 @@ function game_loop() {
         console.log(`food ${i} eaten by player ${j}`);
         food.splice(i, 1);
 
-        let sum = Math.PI * ply.size * ply.size + Math.PI * 15 * 15;
-        ply.size = Math.sqrt(sum / Math.PI);
+        ply.size = Math.sqrt(ply.size**2 + (Math.exp(-ply.size/64 + 1)) * 225)
 
         io.emit('FoodEaten', i);
         i--;
@@ -159,11 +158,10 @@ function game_loop() {
     //determine which is the aggressor (larger)
     let [att, vict] = getBlobRelationship(p1, p2);
     // ignore combat if player are roughly equal size
-    if (att == null) {console.log(`Size diff too smol for players ${ply1.id} and ${ply2.id}`); continue;}
+    if (att == null) {console.log(`Size diff too smol for players ${ply1.id} and ${ply2.id}`);}
 
     // update attackers size directly
-    att.size = Math.sqrt(att.size ** 2 + Math.exp(-att.size + 64) * vict.size**2)
-
+    att.size = Math.sqrt(att.size**2 + (Math.exp(-att.size/64 + 1)) * vict.size**2)
     //kick out the victim if killed
     vict.state = PLAYER_CONNECTED;
     io.emit('PlayerLeft', vict.id);
