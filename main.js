@@ -29,7 +29,11 @@ socket.on('PlayerJoined', (pid, blob) => {
 })
 
 socket.on('PlayerLeft', (pid) => {
-    if (pid == playerID) {return;} // TODO: handle this.
+    if (pid == playerID) {
+        const modal = document.querySelector('#join-game-modal')
+        modal.style.display = 'block'
+        startGame = false;
+    } // TODO: handle this.
     delete players[pid];
 })
 
@@ -146,7 +150,8 @@ function Blob(x, y, r) {
         }
         return false;
     }
-
+    
+    //add constrain to server
     this.constrain = function () {
         this.pos.x = constrain(this.pos.x, -width, width)
         this.pos.y = constrain(this.pos.y, -height, height)
