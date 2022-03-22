@@ -10,6 +10,7 @@ const path = require('path');
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+const { ethers } = require("ethers");
 
 var port = process.env.PORT || 3000
 
@@ -17,7 +18,8 @@ var port = process.env.PORT || 3000
 //io.listen(port);
 
 const PLAYER_CONNECTED = 0;
-const PLAYER_INGAME = 1;
+const PLAYER_AUTHED = 1;
+const PLAYER_INGAME = 2;
 
 io.on("connection", (socket) => {
   let playerId;
@@ -74,12 +76,14 @@ io.on("connection", (socket) => {
     playerId = null;
   })
 
+/*
   socket.on("PlayerLeaveRequest", () => {
     if (!isInGame()) {return;}
     player().state = PLAYER_CONNECTED;
     io.emit("PlayerLeft", playerId);
     console.log(`Player ${playerId} left the game.`);
   })
+*/
 
   socket.on('PlayerUpdate', (px, py, vx, vy) => {
     if (!isInGame()) {return;}
@@ -102,7 +106,18 @@ io.on("connection", (socket) => {
     player().velocity = newvel;
   })
 
+  socket.on('PlayerAuth', (addr, signature, cb) => {
+    const decodedAddress = ethers.utils.verifyMessage(player().nonce.toString(), signature);
+    if (decodedAddress.toLowerCase() == addr.toLowerCase()) {
+      console.log(`Player ${playerId} has successfully authenticated.`);
+      player().state = PLAYER_CONNECTED;
+      cb();
+    }
+  });
+
   playerInit();
+  player().nonce = Math.floor(Math.random() * 10000000);
+  socket.emit('AuthNonce', player().nonce);
   console.log(`Player ${playerId} has successfully connected.`);
 })
 
