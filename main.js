@@ -6,7 +6,7 @@ const socket = io(window.location.href);
 const showAccount = document.querySelector('#show-account')
 
 let signerNonce;
-let isAuthenticated = false; //TODO: must be false in final
+let isAuthenticated = false; //TODO: must be false in final, change to true to skip authentication
 
 if (typeof window.ethereum !== 'undefined') {
     connectBtn.style.display = 'flex'
@@ -102,8 +102,8 @@ async function getSignature() {
     // Prompt user for account connections
      provider.send("eth_requestAccounts", []);
     const signer = await provider.getSigner();
-    const signature =  await signer.signMessage(signerNonce.toString());
-    console.log("Account: ", signer.getAddress());
+    const signature = await signer.signMessage(signerNonce.toString());
+    console.log("Account: ", await signer.getAddress()); //TODO delete in final
     return signature;
 }
 
@@ -115,6 +115,7 @@ function setConnected (account, signature) {
     });
 }
 
+// Uncomment the below line to temporarily skip auth
 // joinButton.style.display = 'flex' //TODO: DELETE THIS
 
 function Blob(x, y, r) {
