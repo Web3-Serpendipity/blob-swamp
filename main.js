@@ -1,30 +1,62 @@
-let blob;
-let food = [];
-let zoom = 1;
-//array to be sent to server to show what's been eaten
-let foodEaten = [];
-let activePlayers = []
-let enemies = []
-//player blob data
-let data;
 const joinButton = document.querySelector("#joinButton")
-//set parameters for arena
-let playerID;
-let vx,vy;
-const socket = io(window.location.href);
-let startGame = false;
-
-let players = [];
-
-const isMetaMaskInstalled = () => ethereum.isMetaMaskInstalled
 const connectBtn = document.getElementById('connect-btn')
+const isMetaMaskInstalled = () => ethereum.isMetaMaskInstalled
 const dlBtn = document.getElementById('dl-btn')
-let signerNonce;
-let isAuthenticated = false;
+const socket = io(window.location.href);
+const showAccount = document.querySelector('#show-account')
 
+let signerNonce;
+let isAuthenticated = true; //TODO: must be false in final
+
+  
+function setup() {
+    createCanvas(windowWidth, windowHeight);
+};
+
+// Main Game Loop
+function draw() {
+    background(0);
+
+    if (currentGame.startGame && isAuthenticated) {
+        if (currentGame.player() == undefined) {return};
+        let localModel = currentGame.player().model;
+
+        translate(width/2, height/2)
+        let newZoom = 64 / localModel.r;
+        let zoom = 1;
+        zoom = lerp(zoom, newZoom, .1)
+        scale(zoom)
+        translate(-localModel.pos.x, -localModel.pos.y)
+        localModel.control();
+
+        //iterate through the food array to get the food
+        for (let i = currentGame.food.length-1; i >= 0; i--) {
+            currentGame.food[i].show();
+        }
+
+        for (let i = 0; i < currentGame.players.length; i++) {
+            if (currentGame.players[i] == undefined) {continue};
+                let blob = currentGame.players[i].model;
+                blob.show();
+                blob.update();
+                blob.constrain();
+        }
+    }
+}
+
+function Game() {
+    this.food = [],
+    this.playerID = undefined,
+    this.startGame = true; //TODO: must be false in final
+    this.players = [],
+
+    this.player = () => this.players[this.playerID]
+
+}
+
+const currentGame = new Game()
 
 if (typeof window.ethereum !== 'undefined') {
-    console.log('MetaMask is installed!');
     connectBtn.style.display = 'flex'
     dlBtn.style.display = 'none'
 } else {
@@ -35,7 +67,6 @@ if (typeof window.ethereum !== 'undefined') {
 socket.on('AuthNonce', (nonce) => {
     signerNonce = nonce
 })
-const showAccount = document.querySelector('#show-account')
 
 connectBtn.addEventListener('click', getAccount);
 
@@ -59,18 +90,11 @@ async function getAccount() {
     }
 }
 
-
-
-
-
-
-
-function player() {
-    return players[playerID];
-}
+//TODO: DELETE THIS
+joinButton.style.display = 'flex'
 
 socket.on('PlayerJoined', (pid, blob) => {
-    players[pid] = {
+    currentGame.players[pid] = {
         id: pid,
         blob: blob,
         model: new Blob(0, 0, 64)
@@ -78,28 +102,28 @@ socket.on('PlayerJoined', (pid, blob) => {
 })
 
 socket.on('PlayerLeft', (pid) => {
-    if (pid == playerID) {
+    if (pid == currentGame.playerID) {
         const modal = document.querySelector('#join-game-modal')
         modal.style.display = 'block'
-        startGame = false;
+        currentGame.startGame = false;
     } // TODO: handle this.
-    delete players[pid];
+    delete currentGame.players[pid];
 })
 
 socket.on("GameUpdate", (contents) => {
-    if (playerID == undefined) {return};
-    if (players[playerID] == undefined) {return};
+    if (currentGame.playerID == undefined) {return};
+    if (currentGame.players[currentGame.playerID] == undefined) {return};
 
     contents.forEach(x => {
-        ply = players[x[0]];
+        ply = currentGame.players[x[0]];
         if (ply == undefined) {return};
         ply.model.r = x[5];
-        if (x[0] == playerID) {return};
+        if (x[0] == currentGame.playerID) {return};
         ply.model.pos = createVector(x[1], x[2]);
         ply.model.velocity = createVector(x[3], x[4]);
     });
 
-    socket.emit("PlayerUpdate", player().model.pos.x, player().model.pos.y, player().model.velocity.x, player().model.velocity.y);
+    socket.emit("PlayerUpdate", currentGame.player().model.pos.x, currentGame.player().model.pos.y, currentGame.player().model.velocity.x, currentGame.player().model.velocity.y);
 });
 
 // Setup plan with server/client code
@@ -109,71 +133,26 @@ socket.on("GameUpdate", (contents) => {
 const playerJoinEvent = () => {
     socket.emit("PlayerJoinRequest", 0 , (id, px, py) => {
         console.log('PlayerJoinRequest response', id, px, py);
-        playerID = id;
-        ply = player();
+        currentGame.playerID = id;
+        ply = currentGame.player();
         ply.model.pos.x = px;
         ply.model.pos.y = py;
     });
 }
     
-function setup() {
-    createCanvas(windowWidth, windowHeight);
 
-    /*for (let i = 0; i < 100; i++) {
-        //positions will need to be fed from server eventually
-        let x = random(-width,width)
-        let y = random(-height,height)
-        //Create a blob object representing food for 100 random locations
-        food[i] = new Blob(x, y, 15);
-    }*/
-}
 
 socket.on('FoodCreated', (id, x, y) => {
-    food[id] = new Blob(x, y, 15);
-    food[id].id = id;
+    currentGame.food[id] = new Blob(x, y, 15);
+    currentGame.food[id].id = id;
 })
 
 socket.on('FoodEaten', (id) => {
-    food.splice(id, 1);
+    currentGame.food.splice(id, 1);
     console.log(`food ${id} eaten`);
 })
 
-// Main Game Loop
-function draw() {
-    background(0);
 
-    if (startGame && isAuthenticated) {
-        if (player() == undefined) {return};
-        let localModel = player().model;
-
-        translate(width/2, height/2)
-        let newZoom = 64 / localModel.r;
-        zoom = lerp(zoom, newZoom, .1)
-        scale(zoom)
-        translate(-localModel.pos.x, -localModel.pos.y)
-        localModel.control();
-
-        //iterate through the food array to get the food
-        for (let i = food.length-1; i >= 0; i--) {
-            food[i].show();
-        }
-
-        for (let i = 0; i < players.length; i++) {
-            if (players[i] == undefined) {continue};
-                let blob = players[i].model;
-                blob.show();
-                blob.update();
-                blob.constrain();
-        }
-
-        // Check to see if blobs are eating each other
-        /*for (let i = activePlayers.length-1; i >= 0; i--) {
-            if (blob.eats(activePlayers[i])) {
-                activePlayers.splice(i, 1)
-            }
-        }*/
-    }
-}
 
 function Blob(x, y, r) {
     this.pos = createVector(x, y);
@@ -223,5 +202,5 @@ joinButton.addEventListener('click', () => {
     const modal = document.querySelector('#join-game-modal')
     modal.style.display = 'none'
     playerJoinEvent()
-    startGame = true;
+    currentGame.startGame = true;
 })
