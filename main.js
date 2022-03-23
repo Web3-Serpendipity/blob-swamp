@@ -6,7 +6,7 @@ const socket = io(window.location.href);
 const showAccount = document.querySelector('#show-account')
 
 let signerNonce;
-let isAuthenticated = true; //TODO: must be false in final
+let isAuthenticated = false; //TODO: must be false in final
 
 if (typeof window.ethereum !== 'undefined') {
     connectBtn.style.display = 'flex'
@@ -33,13 +33,21 @@ function draw() {
 
 function adjustViewport() {
     let localModel = currentGame.player().model;
-    translate(width/2, height/2)
-    let newZoom = 64 / localModel.r;
+    adjustZoom(localModel.r)
+    adjustPosition(-localModel.pos.x, -localModel.pos.y)
+    localModel.control();
+}
+
+function adjustZoom(r) {
+    let newZoom = 64 / r;
     let zoom = 1;
     zoom = lerp(zoom, newZoom, .1)
     scale(zoom)
-    translate(-localModel.pos.x, -localModel.pos.y)
-    localModel.control();
+}
+
+function adjustPosition(x,y) {
+    translate(width/2, height/2)
+    translate(x, y)
 }
 
 function drawFood() {
@@ -61,7 +69,7 @@ function drawPlayers() {
 function Game() {
     this.food = [],
     this.playerID = undefined,
-    this.startGame = true; //TODO: must be false in final
+    this.startGame = false; //TODO: must be false in final
     this.players = [],
     this.player = () => this.players[this.playerID]
 }
@@ -72,29 +80,42 @@ socket.on('AuthNonce', (nonce) => {
     signerNonce = nonce
 })
 
-connectBtn.addEventListener('click', getAccount);
+connectBtn.addEventListener('click', signIn);
 
-async function getAccount() {
-    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-    // Prompt user for account connections
-    await provider.send("eth_requestAccounts", []);
-    const signer = provider.getSigner();
-    const signature = await signer.signMessage(signerNonce.toString());
-    console.log("Account:", await signer.getAddress());
-    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-    const account = accounts[0];
-    showAccount.innerHTML = account;
+async function signIn() {
+    let account  = await getAccount();
+    let signature = await getSignature();
     if (account !== undefined) {
-        connectBtn.style.display = 'none'
-        joinButton.style.display = 'flex'
-        playerAddress = account
-        socket.emit('PlayerAuth', playerAddress, signature, () => {
-            isAuthenticated = true;
-        })
+        setConnected(account, signature)
+        showAccount.innerHTML = account;
     }
 }
 
-joinButton.style.display = 'flex' //TODO: DELETE THIS
+async function getAccount(){
+    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+    const account = accounts[0];
+    return account;
+}
+
+async function getSignature() {
+    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    // Prompt user for account connections
+     provider.send("eth_requestAccounts", []);
+    const signer = await provider.getSigner();
+    const signature =  await signer.signMessage(signerNonce.toString());
+    console.log("Account: ", signer.getAddress());
+    return signature;
+}
+
+function setConnected (account, signature) {
+    connectBtn.style.display = 'none'
+    joinButton.style.display = 'flex'
+    socket.emit('PlayerAuth', account, signature, () => {
+        isAuthenticated = true;
+    });
+}
+
+// joinButton.style.display = 'flex' //TODO: DELETE THIS
 
 function Blob(x, y, r) {
     this.pos = createVector(x, y);
@@ -111,15 +132,6 @@ function Blob(x, y, r) {
         this.pos.add(this.velocity);
     }
 
-    this.eats = function (foodItem) {
-        let d = p5.Vector.dist(this.pos, foodItem.pos)
-        if (d < this.r + foodItem.r) {
-            let sum = PI * this.r * this.r + PI * foodItem.r * foodItem.r
-            this.r = sqrt(this.r ** 2 + Math.exp(-this.r + 64) * foodItem.r**2)
-            return true
-        }
-        return false;
-    }
     //TODO: add constrain to server
     this.constrain = function () {
         this.pos.x = constrain(this.pos.x, -width, width)
