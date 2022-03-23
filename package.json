@@ -1,5 +1,11 @@
 {
 
+    "name": "blob-wars",
+    "version": "0.0.1",
+    "scripts": {
+        "start": "node server.js",
+        "test": "mocha ./test"
+    },
   "dependencies": {
 
     "ethers": "^5.5.4",
@@ -9,6 +15,12 @@
     "mongodb": "^4.4.1",
 
     "socket.io": "^4.4.1"
+
+  },
+
+  "devDependencies": {
+
+    "mocha": "^9.2.2"
 
   }
 
