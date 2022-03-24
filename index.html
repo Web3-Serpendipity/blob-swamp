@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Monoton&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Cinzel&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="styles.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
@@ -18,7 +18,7 @@
         <title>Blob Wars</title>
     </head>
     <body>
-        <div id="join-game-modal" class=" active">
+        <!-- <div id="join-game-modal" class=" active">
             <h1 class="header">Blob War</h1>
             <h3 class="japanese-header">ブロブ戦争</h3>
             <img class="blob" src="./images/title_blob.png" alt="hungry blob">
@@ -28,6 +28,13 @@
                 <br>
                 <button id="joinButton" name="joinButton" class="btn active">Join Game</button>
                 <p id="show-account"></p>
+            </div>
+        </div> -->
+        <div class="u-ded-modal">
+            <h2 class="death-msg">You Died</h2>
+            <div class="killer">
+                <h4>Devoured by:</h4>
+                <img class="killer-blob" src="./images/title_blob.png" alt="the blob that ate you">
             </div>
         </div>
     </body>
