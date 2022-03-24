@@ -1,4 +1,4 @@
-const {insert} = require("./util.js");
+const {insert} = require("./insert.js");
 const {Vector} = require("./vector.js");
 let players = [];
 let food = [];
