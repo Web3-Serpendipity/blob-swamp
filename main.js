@@ -66,14 +66,6 @@ function drawPlayers() {
     }
 }
 
-function Game() {
-    this.food = [],
-    this.playerID = undefined,
-    this.startGame = false; //TODO: must be false in final
-    this.players = [],
-    this.player = () => this.players[this.playerID]
-}
-
 const currentGame = new Game()
 
 socket.on('AuthNonce', (nonce) => {

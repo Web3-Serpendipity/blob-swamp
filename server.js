@@ -219,6 +219,7 @@ function publish(fileName, url = '/' + fileName) {
 
 publish('index.html');
 publish('main.js');
+publish('game.js');
 publish('p5.js');
 publish('styles.css');
 publish('index.html', '/');

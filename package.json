@@ -1,22 +1,15 @@
 {
-
-  "dependencies": {
-
-    "ethers": "^5.5.4",
-
-    "express": "^4.17.3",
-
-    "mongodb": "^4.4.1",
-
-    "socket.io": "^4.4.1"
-
-  },
-
-  "devDependencies": {
-
-    "mocha": "^9.2.2"
-
-  }
-
+    "scripts": {
+        "start": "node server.js",
+        "test": "mocha test/*"
+    },
+    "dependencies": {
+        "ethers": "^5.5.4",
+        "express": "^4.17.3",
+        "mongodb": "^4.4.1",
+        "socket.io": "^4.4.1"
+    },
+    "devDependencies": {
+        "mocha": "^9.2.2"
+    }
 }
-
