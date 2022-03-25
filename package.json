@@ -9,6 +9,7 @@
         "socket.io": "^4.4.1"
     },
     "devDependencies": {
+        "hardhat": "^2.9.2",
         "mocha": "^9.2.2"
     }
 }
