@@ -71,9 +71,9 @@ img {
 
 .u-ded-modal {
     position: absolute;
-    display: flex;
+    display: none; /* TODO start as none */
     width: 100vw;
-    height: 35vh;
+    height: 55vh;
     margin-top: 25vh;
     background: #E6DADA;  /* fallback for old browsers */
     background: -webkit-linear-gradient(to bottom, #274046 -90%, #E6DADA);  /* Chrome 10-25, Safari 5.1-6 */

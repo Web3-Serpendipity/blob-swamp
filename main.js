@@ -4,6 +4,10 @@ const isMetaMaskInstalled = () => ethereum.isMetaMaskInstalled
 const dlBtn = document.getElementById('dl-btn')
 const socket = io(window.location.href);
 const showAccount = document.querySelector('#show-account')
+const returnBtn = document.querySelector('#return-btn')
+const deathModal = document.querySelector('.u-ded-modal')
+const joinModal = document.querySelector('#join-game-modal')
+
 
 let signerNonce;
 let isAuthenticated = false; //TODO: must be false in final, change to true to skip authentication
@@ -153,8 +157,7 @@ function randomHex() {
 }
 
 joinButton.addEventListener('click', () => {
-    const modal = document.querySelector('#join-game-modal')
-    modal.style.display = 'none'
+    joinModal.style.display = 'none'
     playerJoinEvent()
     currentGame.startGame = true;
 })
@@ -179,8 +182,7 @@ socket.on('PlayerJoined', (pid, blob) => {
 
 socket.on('PlayerLeft', (pid) => {
     if (pid == currentGame.playerID) {
-        const modal = document.querySelector('#join-game-modal')
-        modal.style.display = 'block'
+        deathModal.style.display = 'flex'
         currentGame.startGame = false;
     } // TODO: handle this.
     delete currentGame.players[pid];
@@ -210,4 +212,9 @@ socket.on('FoodCreated', (id, x, y) => {
 socket.on('FoodEaten', (id) => {
     currentGame.food.splice(id, 1);
     console.log(`food ${id} eaten`);
+})
+
+returnBtn.addEventListener('click', () => {
+    joinModal.style.display = 'block'
+    deathModal.style.display = 'none'
 })
