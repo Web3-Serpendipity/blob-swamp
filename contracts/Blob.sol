@@ -14,8 +14,17 @@ import './IProxyRegistry.sol';
 contract Blob is ERC721B, Ownable {
     using Strings for uint256;
 
-    // OpenSea"s Proxy Registry
-    IProxyRegistry public immutable proxyRegistry;
+    error NotEnoughEther();
+    error SupplyExceeded();
+
+    IProxyRegistry public immutable proxyRegistry; // OpenSea's Proxy Registry
+
+    //
+    // Constants
+    //
+
+    uint256 private constant MAX_SUPPLY = 100;
+    uint256 private constant PRICE = 0.01 ether;
 
     // The argument is the address of OpenSea's ProxyRegistry (complies with IProxyRegistry)
     constructor(IProxyRegistry _proxyRegistry) ERC721B("Blob", "BLB") {
@@ -42,19 +51,11 @@ contract Blob is ERC721B, Ownable {
         return _exists(tokenId);
     }
 
-    function safeMint(address to, uint256 quantity) public {
+    function mint(address to, uint256 quantity) external payable {
+        if (totalSupply() + quantity > MAX_SUPPLY) revert SupplyExceeded();
+        if (msg.value < PRICE * quantity) revert NotEnoughEther();
+
+        // checks that the recipient is a valid ERC721 reciever - better safe than sorry
         _safeMint(to, quantity);
-    }
-
-    function safeMint(
-        address to,
-        uint256 quantity,
-        bytes memory _data
-    ) public {
-        _safeMint(to, quantity, _data);
-    }
-
-    function mint(address to, uint256 quantity) public {
-        _mint(to, quantity);
     }
 }
