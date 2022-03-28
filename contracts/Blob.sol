@@ -17,7 +17,7 @@ contract Blob is ERC721B, Ownable {
     // OpenSea"s Proxy Registry
     IProxyRegistry public immutable proxyRegistry;
 
-    // The argument is the address of the ProxyRegistry that complies with IProxyRegistry
+    // The argument is the address of OpenSea's ProxyRegistry (complies with IProxyRegistry)
     constructor(IProxyRegistry _proxyRegistry) ERC721B("Blob", "BLB") {
         proxyRegistry = _proxyRegistry;
     }
