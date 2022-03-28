@@ -1,57 +1,60 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "./IBlob.sol";
+// copy-pasted together by @Kibou_web3
+// - Based on a super ultra mega optimized ERC721B by beskay
+// - Supports OpenSea gas-free listing
 
-contract Blob is ERC721, ERC721Enumerable, Ownable, IBlob {
-    using Counters for Counters.Counter;
+pragma solidity ^0.8.9;
 
-    Counters.Counter private _tokenIdCounter;
+import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/utils/Strings.sol';
+import '@beskay/erc721b/contracts/ERC721B.sol';
+import './IProxyRegistry.sol';
 
-    constructor() ERC721("Blob", "BLB") {}
+contract Blob is ERC721B, Ownable {
+    using Strings for uint256;
 
-    uint256 blob_cost = 0.01 ether;
+    // OpenSea"s Proxy Registry
+    IProxyRegistry public immutable proxyRegistry;
 
-    function buyBlob() external payable override {
-        // take ONLY blob_cost eth
-        require(msg.value == blob_cost, "Invalid cost");
-
-        // send funds to the deployer wallet automatically
-        (bool sent, ) = this.owner().call{value: blob_cost}("");
-        require(sent, "Failed to sent eth");
-
-        // mint a blob
-        uint256 tokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
-        _safeMint(msg.sender, tokenId);
-
-        emit BlobBought(msg.sender, tokenId);
+    // The argument is the address of the ProxyRegistry that complies with IProxyRegistry
+    constructor(IProxyRegistry _proxyRegistry) ERC721B("Blob", "BLB") {
+        proxyRegistry = _proxyRegistry;
     }
 
-    function _baseURI() internal pure override returns (string memory) {
-        return "https://blobwars.cool/blob_data?id=";
+    /**
+     * @notice Override isApprovedForAll to whitelist user"s OpenSea proxy accounts to enable gas-less listings.
+     */
+    function isApprovedForAll(address owner, address operator) public view override(ERC721B) returns (bool) {
+        // Whitelist OpenSea proxy contract for easy trading.
+        if (proxyRegistry.proxies(owner) == operator) {
+            return true;
+        }
+        return super.isApprovedForAll(owner, operator);
     }
 
-    // overrides needed by Solidity
+    function tokenURI(uint256 _tokenId) public view override returns (string memory) {
+        if (!_exists(_tokenId)) revert OwnerQueryForNonexistentToken();
+        return string(abi.encodePacked("https://blob-war.herokuapp.com/api/token/", Strings.toString(_tokenId)));
+    }
 
-    function _beforeTokenTransfer(
-        address from,
+    function exists(uint256 tokenId) public view returns (bool) {
+        return _exists(tokenId);
+    }
+
+    function safeMint(address to, uint256 quantity) public {
+        _safeMint(to, quantity);
+    }
+
+    function safeMint(
         address to,
-        uint256 tokenId
-    ) internal override(ERC721, ERC721Enumerable) {
-        super._beforeTokenTransfer(from, to, tokenId);
+        uint256 quantity,
+        bytes memory _data
+    ) public {
+        _safeMint(to, quantity, _data);
     }
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721, ERC721Enumerable, IERC165)
-        returns (bool)
-    {
-        return super.supportsInterface(interfaceId);
+    function mint(address to, uint256 quantity) public {
+        _mint(to, quantity);
     }
 }
