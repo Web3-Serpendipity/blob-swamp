@@ -32,9 +32,6 @@ contract Blob is ERC721B, Ownable, ContextMixin, NativeMetaTransaction {
 
     string public baseUri = "https://blob-war.herokuapp.com/api/token/";
 
-    // Polygon 0x58807baD0B376efc12F5AD86aAc70E78ed67deaE
-    // Mumbai 0xff7Ca10aF37178BdD056628eF42fD7F799fAc77c
-
     // The argument is the address of OpenSea's ProxyRegistry (complies with IProxyRegistry)
     constructor(address _proxyRegistry) ERC721B("Blob", "BLB") Ownable() {
         proxyRegistry = _proxyRegistry;
