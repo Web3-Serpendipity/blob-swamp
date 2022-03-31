@@ -7,6 +7,7 @@ const showAccount = document.querySelector('#show-account')
 const returnBtn = document.querySelector('#return-btn')
 const deathModal = document.querySelector('.u-ded-modal')
 const joinModal = document.querySelector('#join-game-modal')
+const welcomeMsg = document.querySelector('#welcome-msg')
 
 
 let signerNonce;
@@ -91,6 +92,7 @@ async function signIn() {
     let signature = await getSignature();
     if (account !== undefined) {
         setConnected(account, signature)
+        welcomeMsg.style.display = 'block'
         showAccount.innerHTML = account;
     }
 }
