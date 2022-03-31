@@ -2,7 +2,6 @@
     margin: 0;
     padding: 0;
     font-family: Trebuchet MS,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Tahoma,sans-serif;
-    box-sizing: border-box;
 }
 
 body {
@@ -67,31 +66,6 @@ img {
     background: linear-gradient(65deg, red, orange);
     cursor: pointer;
     color: #fff;
-}
-
-.u-ded-modal {
-    position: absolute;
-    display: none; /* TODO start as none */
-    width: 100vw;
-    height: 55vh;
-    margin-top: 25vh;
-    background: #E6DADA;  /* fallback for old browsers */
-    background: -webkit-linear-gradient(to bottom, #274046 -90%, #E6DADA);  /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to bottom, #274046 -90%, #E6DADA); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    box-shadow: 0 0 25px 25px #E6DADA;
-}
-
-.death-msg {
-    font-family: 'Cinzel', serif;
-    font-size: 5rem;
-    color: #8a0303
-}
-
-.killer-blob {
-    width: 200px;
 }
 
 #join-game-modal {
