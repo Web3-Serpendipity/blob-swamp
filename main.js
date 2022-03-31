@@ -28,12 +28,26 @@ function setup() {
 // Main Game Loop
 function draw() {
     background(0);
+
     if (currentGame.startGame && isAuthenticated) {
         if (currentGame.player() == undefined) {return};
+            drawGridLines() //TODO prolly delete this. see how everyone feels but i don't like it
             adjustViewport()
             drawFood()
             drawPlayers()
     }
+}
+
+//TODO prolly delete this. see how everyone feels but i don't like it
+function drawGridLines() {
+    for (var x = 0; x < width; x += width / 15) {
+		for (var y = 0; y < height; y += width / 15) {
+			stroke(125);
+			strokeWeight(1);
+			line(x, 0, x, height);
+			line(0, y, width, y);
+		}
+	}
 }
 
 function adjustViewport() {
