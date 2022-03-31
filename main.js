@@ -156,7 +156,6 @@ joinButton.addEventListener('click', () => {
     const modal = document.querySelector('#join-game-modal')
     modal.style.display = 'none'
     playerJoinEvent()
-    currentGame.startGame = true;
 })
 
 const playerJoinEvent = () => {
@@ -175,6 +174,7 @@ socket.on('PlayerJoined', (pid, blob) => {
         blob: blob,
         model: new Blob(0, 0, 64)
     };
+    currentGame.startGame = true;
 })
 
 socket.on('PlayerLeft', (pid) => {
