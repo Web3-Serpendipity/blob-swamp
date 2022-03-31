@@ -203,11 +203,20 @@ socket.on("GameUpdate", (contents) => {
 });
 
 socket.on('FoodCreated', (id, x, y) => {
-    currentGame.food[id] = new Blob(x, y, 15);
-    currentGame.food[id].id = id;
+    if (currentGame.startGame) {
+        currentGame.food[id] = new Blob(x, y, 15);
+        currentGame.food[id].id = id;
+    }
 })
 
 socket.on('FoodEaten', (id) => {
-    currentGame.food.splice(id, 1);
-    console.log(`food ${id} eaten`);
+    if (currentGame.startGame) {
+        currentGame.food.splice(id, 1);
+        console.log(`food ${id} eaten`);
+    }
+})
+
+returnBtn.addEventListener('click', () => {
+    joinModal.style.display = 'block'
+    deathModal.style.display = 'none'
 })
