@@ -40,12 +40,13 @@ function draw() {
 
 //TODO prolly delete this. see how everyone feels but i don't like it
 function drawGridLines() {
-    for (var x = 0; x < width; x += width / 15) {
-		for (var y = 0; y < height; y += width / 15) {
+    for (var x = 0; x < currentGame.width; x += currentGame.width / 15) {
+		for (var y = 0; y < currentGame.height; y += currentGame.height / 15) {
 			stroke(125);
 			strokeWeight(1);
-			line(x, 0, x, height);
-			line(0, y, width, y);
+			line(x, 0, x, currentGame.height);
+            // line(x1, y1, x2, y2)
+			line(0, y, currentGame.width, y);
 		}
 	}
 }
@@ -91,6 +92,8 @@ function Game() {
     this.startGame = false; //TODO: must be false in final
     this.players = [],
     this.player = () => this.players[this.playerID]
+    this.width = 3000
+    this.height = 3000
 }
 
 const currentGame = new Game()
@@ -155,8 +158,8 @@ function Blob(x, y, r) {
 
     //TODO: add constrain to server
     this.constrain = function () {
-        this.pos.x = constrain(this.pos.x, -width, width)
-        this.pos.y = constrain(this.pos.y, -height, height)
+        this.pos.x = constrain(this.pos.x, -currentGame.width, currentGame.width)
+        this.pos.y = constrain(this.pos.y, -currentGame.height, currentGame.height)
     }
 
     let red = randomHex()
