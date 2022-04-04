@@ -209,5 +209,4 @@ socket.on('FoodCreated', (id, x, y) => {
 
 socket.on('FoodEaten', (id) => {
     currentGame.food.splice(id, 1);
-    console.log(`food ${id} eaten`);
 })
