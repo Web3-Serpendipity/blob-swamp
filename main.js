@@ -40,15 +40,15 @@ function draw() {
 
 //TODO prolly delete this. see how everyone feels but i don't like it
 function drawGridLines() {
+    stroke(125);
+    strokeWeight(1);
     for (var x = 0; x < currentGame.width; x += currentGame.width / 15) {
-		for (var y = 0; y < currentGame.height; y += currentGame.height / 15) {
-			stroke(125);
-			strokeWeight(1);
-			line(x, 0, x, currentGame.height);
-            // line(x1, y1, x2, y2)
-			line(0, y, currentGame.width, y);
-		}
-	}
+        line(x, 0, x, currentGame.height);
+    };
+    for (var y = 0; y < currentGame.height; y += currentGame.height / 15) {
+        line(0, y, currentGame.width, y);
+    };
+	
 }
 
 function adjustViewport() {
