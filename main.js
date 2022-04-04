@@ -31,8 +31,8 @@ function draw() {
 
     if (currentGame.startGame && isAuthenticated) {
         if (currentGame.player() == undefined) {return};
-            drawGridLines() //TODO prolly delete this. see how everyone feels but i don't like it
             adjustViewport()
+            drawGridLines();
             drawFood()
             drawPlayers()
     }
@@ -44,11 +44,8 @@ function drawGridLines() {
     strokeWeight(1);
     for (var x = 0; x < currentGame.width; x += currentGame.width / 15) {
         line(x, 0, x, currentGame.height);
+        line(0, x, currentGame.width, x);
     };
-    for (var y = 0; y < currentGame.height; y += currentGame.height / 15) {
-        line(0, y, currentGame.width, y);
-    };
-	
 }
 
 function adjustViewport() {
