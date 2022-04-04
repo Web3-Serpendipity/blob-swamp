@@ -32,7 +32,7 @@ function draw() {
     if (currentGame.startGame && isAuthenticated) {
         if (currentGame.player() == undefined) {return};
             adjustViewport()
-            drawGridLines();
+            drawGridLines() //TODO prolly delete this. see how everyone feels but i don't like it
             drawFood()
             drawPlayers()
     }
