@@ -13,6 +13,11 @@ img {
     display: block;
 }
 
+h4 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2em;
+}
+
 .header {
     text-align: center;
     text-transform: uppercase;
@@ -68,6 +73,46 @@ img {
     color: #fff;
 }
 
+.u-ded-modal {
+    position: absolute;
+    display: none;
+    width: 100vw;
+    height: 55vh;
+    margin-top: 15vh;
+    background: #E6DADA;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to bottom, #274046 -90%, #E6DADA);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to bottom, #274046 -90%, #E6DADA); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    box-shadow: 0 0 25px 25px #E6DADA;
+}
+
+.always-active {
+    display: block;
+}
+
+.more-padding {
+    padding: 1em 2em;
+}
+
+.death-msg {
+    font-family: 'Cinzel', serif;
+    font-size: 5rem;
+    color: #8a0303
+}
+
+.killer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.killer-blob {
+    width: 200px;
+    margin: 1em 0;
+}
+
 #join-game-modal {
     position: absolute;
     width: 300px;
@@ -79,6 +124,15 @@ img {
     margin: 20px auto;
     background-color: rgb(240, 240, 240);
     /* box-shadow: 0 0 1em 1em rgba(252, 252, 252, 0.2); */
+}
+
+#welcome-msg {
+    display: none;
+    font-family: 'Cinzel', serif;
+}
+
+#show-account {
+    font-size: .75em;
 }
 
 #metamask {
