@@ -195,11 +195,12 @@ publish('images/title_blob.png');
 //
 
 app.get('/api/token/:token_id', function(req, res) {
-  //const tokenId = parseInt(req.params.token_id).toString()
+  const tokenId = parseInt(req.params.token_id).toString()
 
   res.send({
-    name: "Test Blob",
-    description: "Test Blob's description",
+    tokenId = tokenId,
+    name: `Test Blob #${tokenId}`,
+    description: "Test description",
     image: "https://static.wikia.nocookie.net/meme/images/7/7e/Ytroll-troll-crazy-insane.png",
     attributes: [
       {
