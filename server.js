@@ -12,51 +12,29 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const { ethers } = require("ethers");
 
+const {Player} = require('./player.js');
+
 var port = process.env.PORT || 3000
-
-//app.set('port', port);
-//io.listen(port);
-
-const PLAYER_CONNECTED = 0;
-const PLAYER_AUTHED = 1;
-const PLAYER_INGAME = 2;
 
 io.on("connection", (socket) => {
   let playerId;
 
   function playerInit() {
-    let playerData = {
-      state: PLAYER_CONNECTED,
-      pos: new Vector(0, 0),
-      velocity: new Vector(0, 0),
-      size: 0,
-      blob: {}
-    };
-    playerData.id = insert(players, playerData);
-    playerId = playerData.id;
+    let playerObject = new Player();
+    playerId = insert(players, playerObject);
+    playerObject.init(playerId);
   }
 
   function player() {
     return players[playerId];
   }
 
-  function isInGame() {
-    return player().state == PLAYER_INGAME;
-  }
-
   socket.on("PlayerJoinRequest", (tokenId, callback) => {
-    if (isInGame()) {return;}
+    if (!player().joinGame()) {return;}
+    player().pos = new Vector(Math.floor(Math.random()*field_w), Math.floor(Math.random()*field_h));
 
-    let playerData = player();
-    playerData.state = PLAYER_INGAME;
-    playerData.pos = new Vector(Math.floor(Math.random()*field_w), Math.floor(Math.random()*field_h));
-    playerData.velocity = new Vector(0, 0);
-    playerData.size = 64;
-
-    console.log('PlayerJoinRequest', playerId, playerData);
-
-    io.emit("PlayerJoined", playerData.id, playerData.blob);
-    callback(playerData.id, playerData.pos.x, playerData.pos.y);
+    io.emit("PlayerJoined", player().id, player().blob);
+    callback(player().id, player().pos.x, player().pos.y);
 
     for (i = 0; i < food.length; i++) {
       socket.emit('FoodCreated', i, food[i].x, food[i].y);
@@ -66,27 +44,18 @@ io.on("connection", (socket) => {
       if (i == playerId || players[i] == undefined) {continue};
       socket.emit("PlayerJoined", i, players[i].blob);
     }
-    console.log(`Player ${playerId} has joined the game.`);
   });
 
   socket.on('disconnect', () => {
+    player().leaveGame();
     delete players[playerId];
     io.emit("PlayerLeft", playerId);
     console.log(`Player ${playerId} has disconnected (socket closing).`);
     playerId = null;
   })
 
-/*
-  socket.on("PlayerLeaveRequest", () => {
-    if (!isInGame()) {return;}
-    player().state = PLAYER_CONNECTED;
-    io.emit("PlayerLeft", playerId);
-    console.log(`Player ${playerId} left the game.`);
-  })
-*/
-
   socket.on('PlayerUpdate', (px, py, vx, vy) => {
-    if (!isInGame()) {return;}
+    if (!player().isInGame()) {return;}
 
     let newpos = new Vector(px, py);
     let newvel = new Vector(vx, vy);
@@ -107,16 +76,12 @@ io.on("connection", (socket) => {
   })
 
   socket.on('PlayerAuth', (addr, signature, cb) => {
-    const decodedAddress = ethers.utils.verifyMessage(player().nonce.toString(), signature);
-    if (decodedAddress.toLowerCase() == addr.toLowerCase()) {
-      console.log(`Player ${playerId} has successfully authenticated.`);
-      player().state = PLAYER_CONNECTED;
+    if (player().auth(addr, signature)) {
       cb();
     }
   });
 
   playerInit();
-  player().nonce = Math.floor(Math.random() * 10000000);
   socket.emit('AuthNonce', player().nonce);
   console.log(`Player ${playerId} has successfully connected.`);
 })
@@ -151,7 +116,7 @@ function game_loop() {
 
     for (j = 0; j < players.length; j++) {
       let ply = players[j]
-      if (ply != undefined && ply.state == PLAYER_INGAME && ply.pos.distancesqr(food[i]) < (ply.size + 15)**2) {
+      if (ply != undefined && ply.isInGame() && ply.pos.distancesqr(food[i]) < (ply.size + 15)**2) {
         console.log(`food ${i} eaten by player ${j}`);
         food.splice(i, 1);
 
@@ -178,7 +143,7 @@ function game_loop() {
     // update attackers size directly
     att.size = Math.sqrt(att.size**2 + (Math.exp(-att.size/64 + 1)) * vict.size**2)
     //kick out the victim if killed
-    vict.state = PLAYER_CONNECTED;
+    vict.leaveGame();
     io.emit('PlayerLeft', vict.id);
     console.log(`Player ${vict.id} eaten by ${att.id}`);
   }
@@ -187,11 +152,11 @@ function game_loop() {
   // Check eating of other blobs
   for (i = 0; i < players.length; i++) {
     let ply1 = players[i];
-    if (ply1 == undefined || ply1.state != PLAYER_INGAME) {continue;}
+    if (ply1 == undefined || !ply1.isInGame()) {continue;}
 
     for (j = 0; j < players.length; j++) {
       let ply2 = players[j]
-      if (i == j || ply2 == undefined || ply2.state != PLAYER_INGAME) {continue;}
+      if (i == j || ply2 == undefined || !ply2.isInGame()) {continue;}
 
       // if players are close enough together, see which player gets eaten
       if (ply1.pos.distancesqr(ply2.pos) < (ply1.size + ply2.size)**2) {
@@ -203,9 +168,9 @@ function game_loop() {
   // broadcast the game update to all clients
   let contents = [];
   for (i = 0; i < players.length; i++) {
-    let data = players[i];
-    if (data != undefined && data.state == PLAYER_INGAME) {
-      contents.push([data.id, data.pos.x, data.pos.y, data.velocity.x, data.velocity.y, data.size]);
+    let ply = players[i];
+    if (ply != undefined && ply.isInGame()) {
+      contents.push([ply.id, ply.pos.x, ply.pos.y, ply.velocity.x, ply.velocity.y, ply.size]);
     }
   }
 

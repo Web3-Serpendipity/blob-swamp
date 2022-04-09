@@ -9,7 +9,6 @@ const deathModal = document.querySelector('.u-ded-modal')
 const joinModal = document.querySelector('#join-game-modal')
 const welcomeMsg = document.querySelector('#welcome-msg')
 
-
 let signerNonce;
 let isAuthenticated = false; //TODO: must be false in final, change to true to skip authentication
 
@@ -173,7 +172,8 @@ function randomHex() {
 }
 
 joinButton.addEventListener('click', () => {
-    joinModal.style.display = 'none'
+    const modal = document.querySelector('#join-game-modal')
+    modal.style.display = 'none'
     playerJoinEvent()
     currentGame.startGame = true;
 })
@@ -198,7 +198,8 @@ socket.on('PlayerJoined', (pid, blob) => {
 
 socket.on('PlayerLeft', (pid) => {
     if (pid == currentGame.playerID) {
-        deathModal.style.display = 'flex'
+        const modal = document.querySelector('#join-game-modal')
+        modal.style.display = 'block'
         currentGame.startGame = false;
     } // TODO: handle this.
     delete currentGame.players[pid];
@@ -227,10 +228,4 @@ socket.on('FoodCreated', (id, x, y) => {
 
 socket.on('FoodEaten', (id) => {
     currentGame.food.splice(id, 1);
-    console.log(`food ${id} eaten`);
-})
-
-returnBtn.addEventListener('click', () => {
-    joinModal.style.display = 'block'
-    deathModal.style.display = 'none'
 })
