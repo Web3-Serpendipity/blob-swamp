@@ -1,5 +1,5 @@
 // Testing an already deployed contract:
-// CONTRACT_ADDRESS=0x6E1A0dF83982551E7b5aAdb1f175B8A1061271Ef npx hardhat test --network mumbai
+// CONTRACT_ADDRESS=0xeBD309B5de30F414404bFc8747a6181E91D7671C npx hardhat test --network mumbai
 
 const hre = require('hardhat');
 const { ethers } = hre;
@@ -11,6 +11,9 @@ use(solidity)
 
 describe("Blob contract", function() {
   let blob;
+
+  // increase timeout for congested networks
+  this.timeout(120000);
 
   if (process.env.CONTRACT_ADDRESS) {
     it("Should connect to external contract", async function () {
