@@ -9,10 +9,17 @@ use(solidity)
 describe("Blob contract", function() {
   let blob;
 
-  it("deploys correctly", async function () {
+  if (process.env.CONTRACT_ADDRESS) {
+    it("Should connect to external contract", async function () {
+      blob = await ethers.getContractAt("Blob",process.env.CONTRACT_ADDRESS);
+      console.log("Connected to external contract",blob.address)
+    });
+  } else {
+    it("Should deploy", async function () {
       const BlobFactory = await ethers.getContractFactory("Blob");
       blob = await BlobFactory.deploy("0x0000000000000000000000000000000000000000");
-  });
+    });
+  }
 
   describe('mint()', function() {
     it('should be able to mint 3 nfts', async function() {
