@@ -1,3 +1,6 @@
+// Testing an already deployed contract:
+// CONTRACT_ADDRESS=0x6E1A0dF83982551E7b5aAdb1f175B8A1061271Ef npx hardhat test --network mumbai
+
 const hre = require('hardhat');
 const { ethers } = hre;
 const { use, expect } = require('chai');
