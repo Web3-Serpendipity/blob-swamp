@@ -10,6 +10,7 @@ function mnemonic() {
  */
 module.exports = {
   solidity: "0.8.9",
+  defaultNetwork: "mumbai",
   networks: {
 
     localhost: {
@@ -37,5 +38,14 @@ module.exports = {
       },
     }
 
+  },
+
+  etherscan: {
+    apiKey: {
+      mainnet: process.env.ETHERSCAN_API_KEY,
+      rinkeby: process.env.ETHERSCAN_API_KEY,
+      polygon: process.env.POLYGONSCAN_API_KEY,
+      polygonMumbai: process.env.POLYGONSCAN_API_KEY
+    },
   }
 };
