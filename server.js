@@ -216,7 +216,7 @@ app.get('/api/collection', function(req, res) {
   res.send({
     name: `blobs`,
     description: "blob blob blob blob blob blob blob blob",
-    image: "https://static.wikia.nocookie.net/meme/images/7/7e/Ytroll-troll-crazy-insane.png",
+    image: "https://cdn.discordapp.com/attachments/950497085839519858/952148569652076554/79778E77-4CCC-4754-B3D8-3FECD973D214.jpg",
     external_link: "http://blob-war.herokuapp.com",
     seller_fee_basis_points: 5,
     fee_recipient: "0xa8099485e72b7c54bA233e195FA3e0E650BCFF01"
