@@ -4,6 +4,10 @@ const isMetaMaskInstalled = () => ethereum.isMetaMaskInstalled
 const dlBtn = document.getElementById('dl-btn')
 const socket = io(window.location.href);
 const showAccount = document.querySelector('#show-account')
+const returnBtn = document.querySelector('#return-btn')
+const deathModal = document.querySelector('.u-ded-modal')
+const joinModal = document.querySelector('#join-game-modal')
+const welcomeMsg = document.querySelector('#welcome-msg')
 
 let signerNonce;
 let isAuthenticated = false; //TODO: must be false in final, change to true to skip authentication
@@ -23,12 +27,24 @@ function setup() {
 // Main Game Loop
 function draw() {
     background(0);
+
     if (currentGame.startGame && isAuthenticated) {
         if (currentGame.player() == undefined) {return};
             adjustViewport()
+            drawGridLines() //TODO prolly delete this. see how everyone feels but i don't like it
             drawFood()
             drawPlayers()
     }
+}
+
+//TODO prolly delete this. see how everyone feels but i don't like it
+function drawGridLines() {
+    stroke(125);
+    strokeWeight(1);
+    for (var x = 0; x < currentGame.width; x += currentGame.width / 15) {
+        line(x, 0, x, currentGame.height);
+        line(0, x, currentGame.width, x);
+    };
 }
 
 function adjustViewport() {
@@ -72,6 +88,8 @@ function Game() {
     this.startGame = false; //TODO: must be false in final
     this.players = [],
     this.player = () => this.players[this.playerID]
+    this.width = 3000
+    this.height = 3000
 }
 
 const currentGame = new Game()
@@ -87,6 +105,7 @@ async function signIn() {
     let signature = await getSignature();
     if (account !== undefined) {
         setConnected(account, signature)
+        welcomeMsg.style.display = 'block'
         showAccount.innerHTML = account;
     }
 }
@@ -135,8 +154,8 @@ function Blob(x, y, r) {
 
     //TODO: add constrain to server
     this.constrain = function () {
-        this.pos.x = constrain(this.pos.x, -width, width)
-        this.pos.y = constrain(this.pos.y, -height, height)
+        this.pos.x = constrain(this.pos.x, -currentGame.width, currentGame.width)
+        this.pos.y = constrain(this.pos.y, -currentGame.height, currentGame.height)
     }
 
     let red = randomHex()
@@ -209,5 +228,4 @@ socket.on('FoodCreated', (id, x, y) => {
 
 socket.on('FoodEaten', (id) => {
     currentGame.food.splice(id, 1);
-    console.log(`food ${id} eaten`);
 })
