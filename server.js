@@ -198,7 +198,7 @@ app.get('/api/token/:token_id', function(req, res) {
   const tokenId = parseInt(req.params.token_id).toString()
 
   res.send({
-    tokenId = tokenId,
+    tokenId: tokenId,
     name: `Test Blob #${tokenId}`,
     description: "Test description",
     image: "https://static.wikia.nocookie.net/meme/images/7/7e/Ytroll-troll-crazy-insane.png",
