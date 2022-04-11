@@ -212,6 +212,17 @@ app.get('/api/token/:token_id', function(req, res) {
   });
 })
 
+app.get('/api/collection', function(req, res) {
+  res.send({
+    name: `blobs`,
+    description: "blob blob blob blob blob blob blob blob",
+    image: "https://static.wikia.nocookie.net/meme/images/7/7e/Ytroll-troll-crazy-insane.png",
+    external_link: "http://blob-war.herokuapp.com",
+    seller_fee_basis_points: 5,
+    fee_recipient: "0xa8099485e72b7c54bA233e195FA3e0E650BCFF01"
+  });
+})
+
 http.listen(port, function() {
    console.log(`listening on *:${port}`);
 });

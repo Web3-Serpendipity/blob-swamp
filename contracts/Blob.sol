@@ -31,6 +31,7 @@ contract Blob is ERC721B, Ownable, ContextMixin, NativeMetaTransaction {
     address private immutable proxyRegistry;
 
     string public baseUri = "https://blob-war.herokuapp.com/api/token/";
+    string public contractUri = "https://blob-war.herokuapp.com/api/collection/";
 
     // The argument is the address of OpenSea's ProxyRegistry (complies with IProxyRegistry)
     constructor(address _proxyRegistry) ERC721B("Blob", "BLB") Ownable() {
@@ -65,6 +66,14 @@ contract Blob is ERC721B, Ownable, ContextMixin, NativeMetaTransaction {
     function tokenURI(uint256 _tokenId) public view override returns (string memory) {
         if (!_exists(_tokenId)) revert OwnerQueryForNonexistentToken();
         return string(abi.encodePacked(baseUri, Strings.toString(_tokenId)));
+    }
+
+    function setContractUri(string calldata _baseUri) public onlyOwner {
+        contractUri = _baseUri;
+    }
+
+    function contractURI() public view override returns (string memory) {
+        return baseCollectionUri;
     }
 
     // TODO: splitting profits
