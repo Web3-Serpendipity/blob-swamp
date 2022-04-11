@@ -72,7 +72,7 @@ contract Blob is ERC721B, Ownable, ContextMixin, NativeMetaTransaction {
         contractUri = _baseUri;
     }
 
-    function contractURI() public view override returns (string memory) {
+    function contractURI() public view returns (string memory) {
         return contractUri;
     }
 
